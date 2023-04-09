@@ -62,7 +62,7 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
   }
 
   if (chatId.toString() === env.ADMIN_CHAT_ID) {
-    await jarvis(env);
+    await jarvis(env, prompt);
   } else {
     const result = await chatGPT(env, prompt, {
       conversationId,
