@@ -1,13 +1,7 @@
 import chatGPT from "./bots/chatgpt";
 import jarvis from "./bots/jarvis";
 
-const sendMessageToTelegram = async (env, chatId, unprocessedText) => {
-  const text = unprocessedText.replace("#", "");
-  const telegramURL = `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}/sendMessage`;
-  await fetch(
-    `${telegramURL}?chat_id=${chatId}&text=${text}&parse_mode=Markdown`
-  );
-};
+import { sendMessageToTelegram } from "./utils/telegram";
 
 const broadcast = async (env, phrase) => {
   const conversationsResult = await env.conversations.list();
