@@ -1,10 +1,11 @@
 {
   "name": "telegram",
+  "type": "module",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "npx wrangler publish && npx wrangler tail"
   },
   "dependencies": {
     "chatgpt": "^5.0.8"
