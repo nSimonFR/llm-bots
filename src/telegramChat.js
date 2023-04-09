@@ -21,8 +21,7 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
   switch (words[0]) {
     case "/bc": {
       const phrase = words.slice(1).join(" ");
-      // await broadcast(env, `_Broadcast message from Admin:_\n${phrase}`);
-      await broadcast(env, phrase);
+      await broadcast(env, `_Broadcast message from Admin:_\n${phrase}`);
       return;
     }
 
