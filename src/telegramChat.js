@@ -1,5 +1,5 @@
 import chatGPT from "./bots/chatgpt";
-import jarvis from "./bots/jarvis";
+import jarvisReverse from "./bots/jarvisReverse";
 
 import { sendMessageToTelegram } from "./utils/telegram";
 
@@ -54,17 +54,22 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
     default:
   }
 
-  if (chatId.toString() === env.ADMIN_CHAT_ID) {
-    await jarvis(env, prompt);
+  const allowedJarvisUsers = [];
+
+  let result;
+  if (allowedJarvisUsers.includes(chatId.toString())) {
+    result = await jarvisReverse(env, prompt);
   } else {
-    const result = await chatGPT(env, prompt, {
+    result = await chatGPT(env, prompt, {
       conversationId,
       parentMessageId,
     });
+  }
 
-    await sendMessageToTelegram(env, chatId, result.text);
+  await sendMessageToTelegram(env, chatId, result.text);
 
-    if (!result.error) {
+  if (!result.error) {
+    if (result.id) {
       await env.conversations.put(
         chatId,
         JSON.stringify({
@@ -74,9 +79,9 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
           parentMessageId: result.id,
         })
       );
-    } else {
-      throw new Error(result.text);
     }
+  } else {
+    throw new Error(result.text);
   }
 };
 

@@ -1,13 +1,10 @@
 import { ChatGPTUnofficialProxyAPI } from "chatgpt";
 
-const timeoutP = (value, timeout) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(value), timeout);
-  });
+import { timeoutP } from "../utils/commons";
+
+const TIMEOUT = 120000;
 
 const errorAndTimeoutWrapper = async (env, promise) => {
-  const TIMEOUT = 120000;
-
   const handleErrors = async (e) => {
     console.error(e);
     return {

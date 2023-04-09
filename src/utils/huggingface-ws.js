@@ -1,28 +1,20 @@
-const SESSION_HASH = "wkzudhm4w";
+const SESSION_HASH = "kzzqyl2no6d";
 
 const send = (ws, val) => ws.send(JSON.stringify(val));
 
 const waitForMessage = (ws, key) =>
   new Promise((resolve) => {
-    ws.addEventListener("message", (message) => {
-      console.log(JSON.stringify(message));
-      const msg = message.data.msg;
-      if (msg === key) resolve(msg);
-    });
-  });
+    const method = (message) => {
+      const data = JSON.parse(message.data);
+      // console.log("data", data);
+      if (data.msg === key) {
+        resolve(data);
+        ws.removeEventListener("message", method);
+      }
+    };
 
-export const sendKey = async (ws, keyIndex, keyData) => {
-  await send(ws, { fn_index: keyIndex, session_hash: SESSION_HASH });
-  await waitForMessage(ws, "send_data");
-  await send(ws, {
-    fn_index: 4,
-    data: [null, keyData],
-    event_data: null,
-    session_hash: SESSION_HASH,
+    ws.addEventListener("message", method);
   });
-  const result = await waitForMessage(ws, "process_completed");
-  return result.output;
-};
 
 export const connectToWebSocket = async (url) => {
   const resp = await fetch(url, {
@@ -35,4 +27,30 @@ export const connectToWebSocket = async (url) => {
     throw new Error("Server didn't accept WebSocket");
   }
   return ws;
+};
+
+export const sendKey = async (keyIndex, keyData) => {
+  const url = "https://microsoft-hugginggpt.hf.space/queue/join";
+  const ws = await connectToWebSocket(url);
+  ws.accept();
+
+  send(ws, { fn_index: keyIndex, session_hash: SESSION_HASH });
+  await waitForMessage(ws, "send_data");
+
+  send(ws, {
+    fn_index: 4,
+    data: [null, ...keyData],
+    event_data: null,
+    session_hash: SESSION_HASH,
+  });
+  const result = await waitForMessage(ws, "process_completed");
+
+  ws.close();
+
+  if (!result.success) {
+    throw new Error(`No success ${JSON.stringify(result)}`);
+  }
+
+  console.log("rz", result);
+  return result.output.data;
 };
