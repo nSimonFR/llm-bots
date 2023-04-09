@@ -1,4 +1,5 @@
 import chatGPT from "./bots/chatgpt";
+import jarvis from "./bots/jarvis";
 
 const sendMessageToTelegram = async (env, chatId, unprocessedText) => {
   const text = unprocessedText.replace("#", "");
@@ -60,25 +61,29 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
     default:
   }
 
-  const result = await chatGPT(env, prompt, {
-    conversationId,
-    parentMessageId,
-  });
-
-  await sendMessageToTelegram(env, chatId, result.text);
-
-  if (!result.error) {
-    await env.conversations.put(
-      chatId,
-      JSON.stringify({
-        username,
-        message_id,
-        conversationId: result.conversationId,
-        parentMessageId: result.id,
-      })
-    );
+  if (chatId.toString() === env.ADMIN_CHAT_ID) {
+    await jarvis(env);
   } else {
-    throw new Error(result.text);
+    const result = await chatGPT(env, prompt, {
+      conversationId,
+      parentMessageId,
+    });
+
+    await sendMessageToTelegram(env, chatId, result.text);
+
+    if (!result.error) {
+      await env.conversations.put(
+        chatId,
+        JSON.stringify({
+          username,
+          message_id,
+          conversationId: result.conversationId,
+          parentMessageId: result.id,
+        })
+      );
+    } else {
+      throw new Error(result.text);
+    }
   }
 };
 
