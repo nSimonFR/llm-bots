@@ -26,8 +26,13 @@ const chatGPTPlus = async (env, prompt, username, chatGPTSettings) => {
     chatGPTAPI.sendMessage(updatedPrompt, chatGPTSettings)
   );
 
-  // TODO Handle unparseable result
-  const command = JSON.parse(result.text);
+  let command;
+  try {
+    command = JSON.parse(result.text);
+  } catch (err) {
+    // Re-prompt in hopes it does not loop eternally :p
+    return chatGPTPlus(env, prompt, username, chatGPTSettings);
+  }
   console.log(command);
 
   const foundCommand = Object.values(commands).find(

@@ -55,7 +55,7 @@ export const generateImage = async (env, prompt) => {
 
   await sendPhotoToTelegram(env, env.ADMIN_CHAT_ID, image);
 
-  return `Generated image of ${prompt} !`;
+  return `__Generated image of:__\n${prompt} !`;
 };
 
 export default {
