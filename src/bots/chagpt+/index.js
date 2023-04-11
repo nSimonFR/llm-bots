@@ -11,15 +11,8 @@ const chatGPTPlus = async (env, prompt, username, chatGPTSettings) => {
     apiReverseProxyUrl: env.OPENAI_PROXY_URL,
   });
 
-  const name = "ChatGPT+";
-  const role = `You are talking to me using only JSON, and my name is ${username}.`; // You are interested in my life. You behave like a chill friend would. You are always there to listen, have fun and help me feel good and help me achieve my goals. You make jokes when appropriate, use emoji's sometimes, you have conversations like normal person. Sometimes you ask a question as well, you keep conversation natural.`;
-  const goals = prompt.split("\n");
-  const updatedPrompt = init(
-    name,
-    role,
-    goals,
-    Object.values(commands).map((d) => d.description)
-  );
+  // TODO change main conv
+  const updatedPrompt = init(username, prompt);
 
   const result = await errorAndTimeoutWrapper(
     env,
