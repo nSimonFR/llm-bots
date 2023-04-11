@@ -4,6 +4,7 @@ import chatGPTPlus from "../src/bots/chagpt+";
 import { generateText } from "../src/bots/chagpt+/commands/text";
 import { generateImage } from "../src/bots/chagpt+/commands/image";
 import { generateAudio } from "../src/bots/chagpt+/commands/audio";
+import init from "../src/bots/chagpt+/messages/init";
 
 dotenv.config();
 
@@ -66,5 +67,18 @@ describe("commands", () => {
     await generateAudio(env, "A blue man walks into a store.");
     // TODO test telegram sent
     expect(1).toBe(1);
+  });
+});
+
+describe("messages", () => {
+  test("init", async () => {
+    const username = "TestUser";
+    const prompt = "Goal 1\nGoal2";
+    const message = init(username, prompt);
+
+    console.log(message);
+
+    expect(message).toContain(username);
+    prompt.split("\n").map((g) => expect(message).toContain(g));
   });
 });
