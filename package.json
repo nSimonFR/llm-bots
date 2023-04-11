@@ -10,7 +10,8 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest tests --runInBand"
   },
   "dependencies": {
-    "chatgpt": "^5.0.8"
+    "chatgpt": "^5.0.8",
+    "midjourney-client": "^1.0.8"
   },
   "devDependencies": {
     "better-sqlite3": "^8.0.1",

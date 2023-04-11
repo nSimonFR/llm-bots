@@ -21,8 +21,14 @@ export const sendPhotoToTelegram = async (
   if (process.env.NODE_ENV === "test") return;
 
   const formData = new FormData();
-  const randomId = Math.round(Date.now()).toString(36);
-  formData.append("photo", photo, `${randomId}.${format}`);
+
+  // Check if file or blob:
+  if (typeof photo.name === "string") {
+    const randomId = Math.round(Date.now()).toString(36);
+    formData.append("photo", photo, `${randomId}.${format}`);
+  } else {
+    formData.append("photo", photo);
+  }
 
   const telegramURL = `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}/sendPhoto`;
   const res = await fetch(`${telegramURL}?chat_id=${chatId}`, {

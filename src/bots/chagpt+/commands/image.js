@@ -1,3 +1,5 @@
+import midjourney from "midjourney-client";
+
 import { sendPhotoToTelegram } from "../../../utils/telegram";
 
 const generateWithStableDiffusion = async (env, prompt) => {
@@ -22,34 +24,37 @@ const generateWithStableDiffusion = async (env, prompt) => {
 };
 
 const generateWithDALL_E = async (env, prompt) => {
-  // TODO
-  //
-  // const response = await fetch("https://api.openai.com/v1/images/generations", {
-  //   method: "POST",
-  //   headers: {
-  //     Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-  //   },
-  //   body: JSON.stringify({
-  //     prompt,
-  //     n: 1,
-  //     size: "256x256",
-  //   }),
-  // });
-  //
-  // const json = await response.json();
-  // console.log(json);
-  //
-  // process.exit();
+  const response = await fetch("https://api.openai.com/v1/images/generations", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      prompt,
+      n: 1,
+      size: "256x256",
+    }),
+  });
+
+  const json = await response.json();
+  const image = json.data[0].url;
+
+  return image;
+};
+
+const generateWithMidjourney = async (env, prompt) => {
+  const result = await midjourney(prompt, { width: 1024 });
+
+  const image = result[0];
+
+  return image;
 };
 
 export const generateImage = async (env, prompt) => {
   // TODO Run in background ?
 
-  const USE_DALL_E = false;
-
-  const generationMethod = USE_DALL_E
-    ? generateWithDALL_E
-    : generateWithStableDiffusion;
+  const generationMethod = generateWithMidjourney;
 
   const image = await generationMethod(env, prompt);
 
