@@ -6,7 +6,6 @@ const waitForMessage = (ws, key) =>
   new Promise((resolve) => {
     const method = (message) => {
       const data = JSON.parse(message.data);
-      // console.log("data", data);
       if (data.msg === key) {
         resolve(data);
         ws.removeEventListener("message", method);

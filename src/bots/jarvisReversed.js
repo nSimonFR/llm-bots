@@ -1,5 +1,11 @@
-import { sendKey } from "../utils/huggingface-ws";
+/**
+ * An attempt to reving Gradio Websocket / Queue system
+ * In order to access Jarvis / HuggingFace for free
+ *
+ * DOES NOT WORK !
+ */
 
+import { sendKey } from "../utils/gradio-ws";
 import { timeoutP } from "../utils/commons";
 
 const TIMEOUT = 55000;
