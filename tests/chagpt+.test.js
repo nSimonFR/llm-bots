@@ -49,18 +49,18 @@ describe("chatGPT+", () => {
   );
 });
 
-describe.only("commands", () => {
+describe("commands", () => {
   test("generateText", async () => {
     await generateText(env, "A blue man walks into a store.");
     // TODO test telegram sent
     expect(1).toBe(1);
   });
 
-  test.only("generateImage", async () => {
+  test("generateImage", async () => {
     await generateImage(env, "A robot eating the earth.");
     // TODO test telegram sent
     expect(1).toBe(1);
-  });
+  }, 60000);
 
   test("generateAudio", async () => {
     await generateAudio(env, "A blue man walks into a store.");

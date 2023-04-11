@@ -18,7 +18,7 @@ export const sendPhotoToTelegram = async (
   photo,
   format = "jpg"
 ) => {
-  // if (process.env.NODE_ENV === "test") return;
+  if (process.env.NODE_ENV === "test") return;
 
   const formData = new FormData();
   const randomId = Math.round(Date.now()).toString(36);
