@@ -35,7 +35,7 @@ const chatGPTPlus = async (env, prompt, username, chatGPTSettings) => {
     throw new Error(`Unkown command: ${command.command_name}`);
   }
 
-  result.text = await foundCommand.function(env, command.args.prompt);
+  result.text = await foundCommand.function(env, command.args);
 
   return result;
 };

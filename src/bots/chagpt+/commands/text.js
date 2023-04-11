@@ -2,7 +2,7 @@ import { ChatGPTUnofficialProxyAPI } from "chatgpt";
 
 import { errorAndTimeoutWrapper } from "../../../utils/commons";
 
-export const generateText = async (env, prompt) => {
+export const generateText = async (env, { prompt }) => {
   // TODO Use separate memory buffer
   const chatGPTAPI = new ChatGPTUnofficialProxyAPI({
     accessToken: env.OPENAI_ACCESS_TOKEN,
@@ -17,8 +17,13 @@ export const generateText = async (env, prompt) => {
   return result.text;
 };
 
+const settings = {
+  command_name: "generate_audio",
+  args: { prompt: "<text>" },
+};
+
 export default {
   name: "generate_text",
-  description: `Generate Text: command_name: "generate_text", args: "prompt": "<prompt as text>"`,
+  settings,
   function: generateText,
 };

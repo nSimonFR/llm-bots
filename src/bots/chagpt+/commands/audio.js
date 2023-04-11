@@ -1,10 +1,21 @@
 import { sendAudioToTelegram } from "../../../utils/telegram";
 
-export const generateAudio = async (env, prompt) => {
+const VOICES = {
+  male: "ErXwobaYiN019PkySvjV",
+  female: "EXAVITQu4vr4xnSDxMaL",
+};
+const DEFAULT = "male";
+
+export const generateAudio = async (env, { prompt, voice }) => {
   // TODO Run in background ?
   // TODO Use separate memory buffer
 
-  const voiceId = "ErXwobaYiN019PkySvjV";
+  let voiceId = VOICES[voice];
+  if (!voiceId) {
+    console.error(`Cannot find motor ${voice} - defaulting to ${DEFAULT}`);
+    voiceId = VOICES[DEFAULT];
+  }
+
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
   const response = await fetch(url, {
     method: "POST",
@@ -23,8 +34,13 @@ export const generateAudio = async (env, prompt) => {
   return `__Generated audio ! Transcript:__\n${prompt}`;
 };
 
+const settings = {
+  command_name: "generate_audio",
+  args: { prompt: "<text>", voice: Object.keys(VOICES).join(`|`) },
+};
+
 export default {
   name: "generate_audio",
-  description: `Generate Audio: command_name: "generate_audio", args: "prompt": "<prompt as text>"`,
+  settings,
   function: generateAudio,
 };

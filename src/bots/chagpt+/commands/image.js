@@ -51,20 +51,36 @@ const generateWithMidjourney = async (env, prompt) => {
   return image;
 };
 
-export const generateImage = async (env, prompt) => {
-  // TODO Run in background ?
+const ENGINES = {
+  stable_diffusion: generateWithStableDiffusion,
+  dall_e: generateWithDALL_E,
+  midjourney: generateWithMidjourney,
+};
+const DEFAULT = "midjourney";
+ENGINES.default = ENGINES[DEFAULT];
 
-  const generationMethod = generateWithMidjourney;
+export const generateImage = async (env, { prompt, engine }) => {
+  // TODO Run in background ?
+  const generationMethod = ENGINES[engine];
+  if (!generationMethod) {
+    console.error(`Cannot find engine ${engine} - restarting with ${DEFAULT}`);
+    return generateImage(env, { prompt, engine: DEFAULT });
+  }
 
   const image = await generationMethod(env, prompt);
 
   await sendPhotoToTelegram(env, env.ADMIN_CHAT_ID, image);
 
-  return `__Generated image of:__\n${prompt} !`;
+  return `__Generated image with ${engine} of:__\n${prompt} !`;
+};
+
+const settings = {
+  command_name: "generate_audio",
+  args: { prompt: "<text>", engine: Object.keys(ENGINES).join(`|`) },
 };
 
 export default {
   name: "generate_image",
-  description: `Generate Image: command_name: "generate_image", args: "prompt": "<prompt as text>"`,
+  settings,
   function: generateImage,
 };
