@@ -10,10 +10,10 @@ export const generateAudio = async (env, { prompt, voice }) => {
   // TODO Run in background ?
   // TODO Use separate memory buffer
 
-  let voiceId = VOICES[voice];
+  const voiceId = VOICES[voice];
   if (!voiceId) {
-    console.error(`Cannot find motor ${voice} - defaulting to ${DEFAULT}`);
-    voiceId = VOICES[DEFAULT];
+    console.error(`Cannot find voice ${voice} - restarting with ${DEFAULT}`);
+    return generateAudio(env, { prompt, voice: DEFAULT });
   }
 
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
@@ -31,7 +31,7 @@ export const generateAudio = async (env, { prompt, voice }) => {
   const audio = await response.blob();
   await sendAudioToTelegram(env, env.ADMIN_CHAT_ID, audio);
 
-  return `__Generated audio ! Transcript:__\n${prompt}`;
+  return `__Generated audio with voice ${voice}! Transcript:__\n${prompt}`;
 };
 
 const settings = {

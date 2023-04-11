@@ -1,5 +1,4 @@
-import midjourney from "midjourney-client";
-
+import { timeoutP } from "../../../utils/commons";
 import { sendPhotoToTelegram } from "../../../utils/telegram";
 
 const generateWithStableDiffusion = async (env, prompt) => {
@@ -16,7 +15,6 @@ const generateWithStableDiffusion = async (env, prompt) => {
       }),
     }
   );
-  console.log(prompt);
 
   const image = await response.blob();
 
@@ -38,17 +36,46 @@ const generateWithDALL_E = async (env, prompt) => {
   });
 
   const json = await response.json();
-  const image = json.data[0].url;
 
-  return image;
+  return json.data[0].url;
 };
 
 const generateWithMidjourney = async (env, prompt) => {
-  const result = await midjourney(prompt, { width: 1024 });
+  const POLLING_RATE = 500;
+  const baseUrl = "https://replicate.com/api";
+  const finalStatuses = ["canceled", "succeeded", "failed"];
 
-  const image = result[0];
+  const model =
+    "prompthero/openjourney:9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb";
+  const [path, version] = model.split(":");
 
-  return image;
+  const postUrl = `/models/${path}/versions/${version}/predictions`;
+  const postRes = await fetch(baseUrl + postUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      inputs: { prompt },
+    }),
+  });
+
+  let prediction = await postRes.json();
+
+  /* eslint-disable no-await-in-loop */
+  while (!finalStatuses.includes(prediction.status)) {
+    await timeoutP(POLLING_RATE);
+
+    const getUrl = `/models${prediction.version.model.absolute_url}/versions/${prediction.version_id}/predictions/${prediction.uuid}`;
+    const response = await fetch(baseUrl + getUrl);
+    const result = await response.json();
+
+    prediction = result.prediction;
+  }
+  /* eslint-enable no-await-in-loop */
+
+  return prediction.output;
 };
 
 const ENGINES = {
