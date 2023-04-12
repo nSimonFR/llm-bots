@@ -1,25 +1,32 @@
-export const sendMessageToTelegram = async (env, chatId, unprocessedText) => {
-  if (process.env.NODE_ENV === "test") return;
+const telegramHelper = async (env, url, body = undefined) => {
+  // if (process.env.NODE_ENV === "test") return;
 
-  const text = unprocessedText.replace("#", "");
-  const telegramURL = `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}/sendMessage`;
-  const res = await fetch(
-    `${telegramURL}?chat_id=${chatId}&text=${text}&parse_mode=Markdown`
+  const response = await fetch(
+    `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}${url}`,
+    { method: body ? "POST" : "GET", body }
   );
 
-  if (!res.ok) {
-    throw new Error(await res.text());
+  if (!response.ok) {
+    throw new Error(await response.text());
   }
 };
 
+export const sendMessageToTelegram = async (env, chat_id, text) =>
+  telegramHelper(
+    env,
+    `/sendMessage?${new URLSearchParams({
+      chat_id,
+      text: text.replace("#", ""),
+      parse_mode: "Markdown",
+    })}`
+  );
+
 export const sendPhotoToTelegram = async (
   env,
-  chatId,
+  chat_id,
   photo,
   format = "jpg"
 ) => {
-  if (process.env.NODE_ENV === "test") return;
-
   const formData = new FormData();
 
   // Check if file or blob:
@@ -30,36 +37,32 @@ export const sendPhotoToTelegram = async (
     formData.append("photo", photo);
   }
 
-  const telegramURL = `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}/sendPhoto`;
-  const res = await fetch(`${telegramURL}?chat_id=${chatId}`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!res.ok) {
-    throw new Error(await res.text());
-  }
+  return telegramHelper(
+    env,
+    `/sendPhoto?${new URLSearchParams({
+      chat_id,
+      parse_mode: "Markdown",
+    })}`,
+    formData
+  );
 };
 
 export const sendAudioToTelegram = async (
   env,
-  chatId,
+  chat_id,
   audio,
   format = "mp3"
 ) => {
-  if (process.env.NODE_ENV === "test") return;
-
   const formData = new FormData();
   const randomId = Math.round(Date.now()).toString(36);
   formData.append("document", audio, `${randomId}.${format}`);
 
-  const telegramURL = `https://api.telegram.org/bot${env.TELEGRAM_API_KEY}/sendDocument`;
-  const res = await fetch(`${telegramURL}?chat_id=${chatId}`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!res.ok) {
-    throw new Error(await res.text());
-  }
+  return telegramHelper(
+    env,
+    `/sendDocument?${new URLSearchParams({
+      chat_id,
+      parse_mode: "Markdown",
+    })}`,
+    formData
+  );
 };

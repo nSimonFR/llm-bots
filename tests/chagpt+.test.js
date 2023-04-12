@@ -5,6 +5,7 @@ import { generateText } from "../src/bots/chagpt+/commands/text";
 import { generateImage } from "../src/bots/chagpt+/commands/image";
 import { generateAudio } from "../src/bots/chagpt+/commands/audio";
 import init from "../src/bots/chagpt+/messages/init";
+import { sendMessageToTelegram } from "../src/utils/telegram";
 
 dotenv.config();
 
@@ -80,5 +81,11 @@ describe("messages", () => {
 
     expect(message).toContain(username);
     prompt.split("\n").map((g) => expect(message).toContain(g));
+  });
+});
+
+describe("utils", () => {
+  test.only("telegram", async () => {
+    await sendMessageToTelegram(env, env.ADMIN_CHAT_ID, "Hello world !");
   });
 });
