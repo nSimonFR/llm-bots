@@ -98,6 +98,7 @@ const chatWrapped = async (env, message) => {
   try {
     await telegramChat(env, { chatId, username, text, message_id });
   } catch (err) {
+    console.error(err);
     await sendMessageToTelegram(
       env,
       env.ADMIN_CHAT_ID,
