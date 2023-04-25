@@ -7,7 +7,9 @@ const telegramHelper = async (env, url, body = undefined) => {
   );
 
   if (!response.ok) {
-    throw new Error(await response.text());
+    const error = await response.text();
+    console.error(url, body, error);
+    throw new Error(error);
   }
 };
 
