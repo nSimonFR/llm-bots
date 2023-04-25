@@ -1,5 +1,6 @@
 wrangler.toml
 .env
 .env.json
+out/
 .wrangler/
 node_modules/
