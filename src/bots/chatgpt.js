@@ -2,14 +2,13 @@ import { ChatGPTUnofficialProxyAPI } from "chatgpt";
 
 import { errorAndTimeoutWrapper } from "../utils/commons";
 
-const chatGPT = async (env, prompt, chatGPTSettings) => {
+const chatGPT = async (prompt, chatGPTSettings) => {
   const chatGPTAPI = new ChatGPTUnofficialProxyAPI({
-    accessToken: env.OPENAI_ACCESS_TOKEN,
-    apiReverseProxyUrl: env.OPENAI_PROXY_URL,
+    accessToken: process.env.OPENAI_ACCESS_TOKEN,
+    apiReverseProxyUrl: process.env.OPENAI_PROXY_URL,
   });
 
   const result = await errorAndTimeoutWrapper(
-    env,
     chatGPTAPI.sendMessage(prompt, chatGPTSettings)
   );
 

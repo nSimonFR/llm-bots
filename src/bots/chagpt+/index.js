@@ -6,7 +6,7 @@ import commandsInit from "./messages/commands/init";
 import commands from "./commands";
 import chatGPT from "../chatgpt";
 
-const commandModule = async (env, text) => {
+const commandModule = async (text) => {
   let command;
   try {
     command = JSON.parse(text);
@@ -25,13 +25,12 @@ const commandModule = async (env, text) => {
     throw new Error(`Unkown command: ${command.command_name}`);
   }
 
-  return foundCommand.function(env, command.args);
+  return foundCommand.function(command.args);
 };
 
 const BOTNAME = "ChatGPT+";
 
 const chatGPTPlus = async (
-  env,
   prompt,
   username,
   messageId,
@@ -40,8 +39,8 @@ const chatGPTPlus = async (
   COMMAND = true,
   MEMORY = false
 ) => {
-  const mem = await memoryModule(env);
-  const embedding = await getEmbedding(env, prompt);
+  const mem = await memoryModule();
+  const embedding = await getEmbedding(prompt);
   const memories = await mem.query(embedding, { username });
   const memory = MEMORY
     ? memories
@@ -64,15 +63,15 @@ const chatGPTPlus = async (
   );
   // console.log(updatedPrompt);
 
-  const result = await chatGPT(env, updatedPrompt, chatGPTSettings);
+  const result = await chatGPT(updatedPrompt, chatGPTSettings);
 
   if (COMMAND) {
     try {
-      result.text = await commandModule(env, result.text);
+      result.text = await commandModule(result.text);
     } catch (err) {
       console.error("ChatGPT+ error (to retry)", err.message);
       // Re-prompt in hopes it does not loop eternally :p
-      return chatGPTPlus(env, prompt, username, chatGPTSettings);
+      return chatGPTPlus(prompt, username, chatGPTSettings);
     }
   }
 

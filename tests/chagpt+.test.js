@@ -25,7 +25,7 @@ describe("chatGPT+", () => {
       const prompt = "Generate a small story about a cat";
       const username = "test";
 
-      const result = await chatGPTPlus(env, prompt, username);
+      const result = await chatGPTPlus(prompt, username);
       console.log(result.text);
 
       expect(result.text).toContain("cat");
@@ -38,7 +38,7 @@ describe("chatGPT+", () => {
     async () => {
       const prompt = "Generate an image of a black cat on a white background";
 
-      const result = await chatGPTPlus(env, prompt);
+      const result = await chatGPTPlus(prompt);
 
       expect(result.text).toContain("Generated image");
     },
@@ -50,7 +50,7 @@ describe("chatGPT+", () => {
     async () => {
       const prompt = "Generate an audio story about a cat";
 
-      const result = await chatGPTPlus(env, prompt);
+      const result = await chatGPTPlus(prompt);
 
       expect(result.text).toContain("Generated audio");
     },
@@ -60,14 +60,14 @@ describe("chatGPT+", () => {
 
 describe("commands", () => {
   test("replyText", async () => {
-    await replyText(env, { prompt: "A blue man walks into a store." });
+    await replyText({ prompt: "A blue man walks into a store." });
     // TODO test telegram sent
     expect(1).toBe(1);
   });
 
   describe("generateImage", () => {
     test("stable_diffusion", async () => {
-      await generateImage(env, {
+      await generateImage({
         prompt: "A robot eating the earth.",
         engine: "stable_diffusion",
       });
@@ -76,7 +76,7 @@ describe("commands", () => {
     });
 
     test("dall_e", async () => {
-      await generateImage(env, {
+      await generateImage({
         prompt: "A robot eating the earth.",
         engine: "dall_e",
       });
@@ -85,7 +85,7 @@ describe("commands", () => {
     }, 10000);
 
     test("midjourney", async () => {
-      await generateImage(env, {
+      await generateImage({
         prompt: "A robot eating the earth.",
         engine: "midjourney",
       });
@@ -95,7 +95,7 @@ describe("commands", () => {
   });
 
   test("generateAudio", async () => {
-    await generateAudio(env, { prompt: "A blue man walks into a store." });
+    await generateAudio({ prompt: "A blue man walks into a store." });
     // TODO test telegram sent
     expect(1).toBe(1);
   });
@@ -116,11 +116,11 @@ describe("messages", () => {
 
 describe("utils", () => {
   test("telegram", async () => {
-    await sendMessageToTelegram(env, env.ADMIN_CHAT_ID, "Hello world !");
+    await sendMessageToTelegram(env.ADMIN_CHAT_ID, "Hello world !");
   });
 
   test("embeddings", async () => {
-    const embedding = await getEmbedding(env, "Hello world !");
+    const embedding = await getEmbedding("Hello world !");
 
     expect(Array.isArray(embedding)).toBe(true);
     expect(Number.isNaN(parseFloat(embedding[0]))).toBe(false);

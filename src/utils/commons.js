@@ -3,7 +3,7 @@ export const timeoutP = (value, timeout) =>
     setTimeout(() => resolve(value), timeout);
   });
 
-export const errorAndTimeoutWrapper = async (env, promise) => {
+export const errorAndTimeoutWrapper = async (promise) => {
   const TIMEOUT = 120000;
 
   const handleErrors = async (e) => {

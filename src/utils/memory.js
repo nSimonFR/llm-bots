@@ -40,10 +40,10 @@ const query = (index) => async (vector, filter) => {
   return result.matches;
 };
 
-const memory = async (env) => {
+const memory = async () => {
   await pinecone.init({
-    environment: env.PINECONE_ENV,
-    apiKey: env.PINECONE_API_KEY,
+    environment: process.env.PINECONE_ENV,
+    apiKey: process.env.PINECONE_API_KEY,
   });
 
   const indexes = await pinecone.listIndexes();

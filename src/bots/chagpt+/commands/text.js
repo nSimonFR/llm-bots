@@ -1,4 +1,4 @@
-export const replyText = async (env, { prompt }) => prompt;
+export const replyText = async ({ prompt }) => prompt;
 
 const settings = {
   command_name: "reply_text",

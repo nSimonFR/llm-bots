@@ -10,10 +10,10 @@ import { timeoutP } from "../utils/commons";
 
 const TIMEOUT = 55000;
 
-const jarvis = async (env, prompt) => {
+const jarvis = async (prompt) => {
   const mainFlow = async () => {
-    await sendKey(4, [env.OPENAI_API_KEY]);
-    await sendKey(7, [env.HUGGING_FACE_TOKEN]);
+    await sendKey(4, [process.env.OPENAI_API_KEY]);
+    await sendKey(7, [process.env.HUGGING_FACE_TOKEN]);
 
     const inputResult = await sendKey(5, [[], prompt]);
     console.log(inputResult);

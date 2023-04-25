@@ -1,13 +1,13 @@
 import { timeoutP } from "./commons";
 
-const getEmbeddingFree = (modelId) => async (env, text) => {
+const getEmbeddingFree = (modelId) => async (text) => {
   const url = `https://api-inference.huggingface.co/pipeline/feature-extraction/${modelId}`;
 
   const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${env.HUGGING_FACE_TOKEN}`,
+      Authorization: `Bearer ${process.env.HUGGING_FACE_TOKEN}`,
     },
     body: JSON.stringify({
       inputs: [text],
@@ -19,19 +19,19 @@ const getEmbeddingFree = (modelId) => async (env, text) => {
   if (json.error) {
     console.log(json);
     await timeoutP(1000);
-    return getEmbeddingFree(modelId)(env, text);
+    return getEmbeddingFree(modelId)(text);
   }
   return json[0];
 };
 
-const getEmbeddingOpenAI = (model) => async (env, input) => {
+const getEmbeddingOpenAI = (model) => async (input) => {
   const url = `https://api.openai.com/v1/embeddings`;
 
   const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       input,
