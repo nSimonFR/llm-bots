@@ -31,7 +31,7 @@ export const generateAudio = async (env, { prompt, voice }) => {
   const audio = await response.blob();
   await sendAudioToTelegram(env, env.ADMIN_CHAT_ID, audio);
 
-  return `__Generated audio with voice ${voice}! Transcript:__\n${prompt}`;
+  return `*Generated audio with voice \`${voice}\`! Transcript:*\n${prompt}`;
 };
 
 const settings = {

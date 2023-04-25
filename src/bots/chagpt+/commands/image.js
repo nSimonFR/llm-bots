@@ -2,8 +2,8 @@ import { timeoutP } from "../../../utils/commons";
 import { sendPhotoToTelegram } from "../../../utils/telegram";
 
 const generateWithStableDiffusion = async (env, prompt) => {
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4",
+  const baseResponse = await fetch(
+    "https://api-inference.huggingface.co/models/Gustavosta/MagicPrompt-Stable-Diffusion",
     {
       method: "POST",
       headers: {
@@ -16,12 +16,49 @@ const generateWithStableDiffusion = async (env, prompt) => {
     }
   );
 
+  const promptJson = await baseResponse.json();
+  const inputs = promptJson[0].generated_text;
+
+  const model = "CompVis/stable-diffusion-v1-4";
+  // const model = "stabilityai/stable-diffusion-2-1";
+
+  const response = await fetch(
+    `https://api-inference.huggingface.co/models/${model}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.HUGGING_FACE_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs,
+      }),
+    }
+  );
+
   const image = await response.blob();
 
-  return image;
+  return [inputs, image];
 };
 
-const generateWithDALL_E = async (env, prompt) => {
+const generateWithDALL_E = async (env, inputs) => {
+  const baseResponse = await fetch(
+    "https://api-inference.huggingface.co/models/Gustavosta/MagicPrompt-Dalle",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.HUGGING_FACE_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs,
+      }),
+    }
+  );
+
+  const promptJson = await baseResponse.json();
+  const prompt = promptJson[0].generated_text;
+
   const response = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
     headers: {
@@ -31,13 +68,18 @@ const generateWithDALL_E = async (env, prompt) => {
     body: JSON.stringify({
       prompt,
       n: 1,
-      size: "256x256",
+      size: "512x512",
     }),
   });
 
   const json = await response.json();
 
-  return json.data[0].url;
+  if (json.error) {
+    throw new Error(json.error.message);
+  }
+
+  const image = json.data[0].url;
+  return [prompt, image];
 };
 
 const generateWithMidjourney = async (env, prompt) => {
@@ -54,7 +96,7 @@ const generateWithMidjourney = async (env, prompt) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${env.REPLICATE_API_KEY}`,
     },
     body: JSON.stringify({
       inputs: { prompt },
@@ -75,16 +117,16 @@ const generateWithMidjourney = async (env, prompt) => {
   }
   /* eslint-enable no-await-in-loop */
 
-  return prediction.output;
+  return [prompt, prediction.output];
 };
 
 const ENGINES = {
-  stable_diffusion: generateWithStableDiffusion,
-  dall_e: generateWithDALL_E,
-  midjourney: generateWithMidjourney,
+  stablediffusion: generateWithStableDiffusion,
+  dalle: generateWithDALL_E,
+  // midjourney: generateWithMidjourney,
+  undefined,
 };
-const DEFAULT = "midjourney";
-ENGINES.default = ENGINES[DEFAULT];
+const DEFAULT = "stablediffusion";
 
 export const generateImage = async (env, { prompt, engine }) => {
   // TODO Run in background ?
@@ -94,11 +136,11 @@ export const generateImage = async (env, { prompt, engine }) => {
     return generateImage(env, { prompt, engine: DEFAULT });
   }
 
-  const image = await generationMethod(env, prompt);
+  const [updatedPrompt, image] = await generationMethod(env, prompt);
 
   await sendPhotoToTelegram(env, env.ADMIN_CHAT_ID, image);
 
-  return `__Generated image with ${engine} of:__\n${prompt} !`;
+  return `*Generated image with ${engine};*\n${updatedPrompt}`;
 };
 
 const settings = {
