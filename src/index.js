@@ -1,4 +1,4 @@
-import telegramChat from "./telegramChat";
+import telegramChat from "./telegram";
 
 export default {
   async fetch(request, env) {
