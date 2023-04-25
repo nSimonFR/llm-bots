@@ -1,30 +1,20 @@
-import { ChatGPTUnofficialProxyAPI } from "chatgpt";
+import memoryModule from "../../utils/memory";
+import getEmbedding from "../../utils/embeddings";
 
-import { errorAndTimeoutWrapper } from "../../utils/commons";
-
+import memoryInit from "./messages/memory/init";
+import commandsInit from "./messages/commands/init";
 import commands from "./commands";
-import init from "./messages/init";
+import chatGPT from "../chatgpt";
 
-const chatGPTPlus = async (env, prompt, username, chatGPTSettings) => {
-  const chatGPTAPI = new ChatGPTUnofficialProxyAPI({
-    accessToken: env.OPENAI_ACCESS_TOKEN,
-    apiReverseProxyUrl: env.OPENAI_PROXY_URL,
-  });
-
-  // TODO change main conv
-  const updatedPrompt = init(username, prompt);
-
-  const result = await errorAndTimeoutWrapper(
-    env,
-    chatGPTAPI.sendMessage(updatedPrompt, chatGPTSettings)
-  );
-
+const commandModule = async (env, text) => {
   let command;
   try {
-    command = JSON.parse(result.text);
+    command = JSON.parse(text);
   } catch (err) {
-    // Re-prompt in hopes it does not loop eternally :p
-    return chatGPTPlus(env, prompt, username, chatGPTSettings);
+    const startIndex = text.indexOf("{");
+    const endIndex = text.lastIndexOf("}");
+    const jsonString = text.slice(startIndex, endIndex + 1);
+    command = JSON.parse(jsonString);
   }
   console.log(command);
 
@@ -35,7 +25,62 @@ const chatGPTPlus = async (env, prompt, username, chatGPTSettings) => {
     throw new Error(`Unkown command: ${command.command_name}`);
   }
 
-  result.text = await foundCommand.function(env, command.args);
+  return foundCommand.function(env, command.args);
+};
+
+const BOTNAME = "ChatGPT+";
+
+const chatGPTPlus = async (
+  env,
+  prompt,
+  username,
+  messageId,
+  lastMessage,
+  chatGPTSettings,
+  COMMAND = true,
+  MEMORY = false
+) => {
+  const mem = await memoryModule(env);
+  const embedding = await getEmbedding(env, prompt);
+  const memories = await mem.query(embedding, { username });
+  const memory = MEMORY
+    ? memories
+        .map(
+          (m) =>
+            `${m.metadata.username}: ${m.metadata.prompt}` +
+            "\n" +
+            `${BOTNAME}: ${m.metadata.result}`
+        )
+        .join("\n")
+    : [];
+
+  const initMessage = COMMAND ? commandsInit : memoryInit;
+  const updatedPrompt = await initMessage(
+    BOTNAME,
+    username,
+    prompt,
+    memory,
+    lastMessage
+  );
+  // console.log(updatedPrompt);
+
+  const result = await chatGPT(env, updatedPrompt, chatGPTSettings);
+
+  if (COMMAND) {
+    try {
+      result.text = await commandModule(env, result.text);
+    } catch (err) {
+      console.error("ChatGPT+ error (to retry)", err.message);
+      // Re-prompt in hopes it does not loop eternally :p
+      return chatGPTPlus(env, prompt, username, chatGPTSettings);
+    }
+  }
+
+  await mem.insert(messageId, embedding, {
+    prompt,
+    result: result.text,
+    username,
+  });
 
   return result;
 };

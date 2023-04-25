@@ -1,20 +1,21 @@
-import commands from "../commands";
+import commands from "../../commands";
 
 const formatList = (list) => list.map((e, i) => `${i + 1}. ${e}`).join("\n");
 
-const message = (name, role, goals, commandsFormatted) => `
-You are ${name}, ${role}
-Your decisions must always be made independently without seeking user assistance.
-Play to your strengths as an LLM and pursue simple strategies with no legal complications.
-
-GOALS:
-${formatList(goals)}
+const message = (
+  botname,
+  username,
+  goals,
+  memory,
+  commandsFormatted,
+  lastMessage
+) => `
+You are ${botname}, my name is ${username}.
 
 COMMANDS:
 ${formatList(commandsFormatted)}
 
-YOU SHOULD ONLY RESPOND IN JSON format as described below
-RESPONSE FORMAT:
+YOU SHOULD ONLY RESPOND IN JSON FORMAT AS DESCRIBED BELOW - RESPONSE FORMAT:
 {
   "command_name": "command name",
   "args": {
@@ -26,9 +27,15 @@ Ensure the response can be parsed by Javascript JSON.parse
 The current time and date is ${new Date().toLocaleTimeString()} ${new Date().toDateString()} 
 
 This reminds you of these events from your past:
-[]
+${memory}
 
-DETERMINE WHICH NEXT COMMAND TO USE, AND RESPOND USING THE FORMAT SPECIFIED ABOVE:
+Your last message is:
+${lastMessage || ""}
+
+GOALS:
+${formatList(goals)}
+
+DETERMINE WHICH NEXT COMMAND TO USE, AND RESPOND IN JSON USING THE FORMAT SPECIFIED ABOVE:
 `;
 
 // You are interested in my life.
@@ -37,15 +44,19 @@ DETERMINE WHICH NEXT COMMAND TO USE, AND RESPOND USING THE FORMAT SPECIFIED ABOV
 // You make jokes when appropriate, use emoji's sometimes, you have conversations like normal person.
 // Sometimes you ask a question as well, you keep conversation natural.`;
 
-const init = (username, prompt) => {
-  const name = "ChatGPT+";
-  const role = `You are talking to me using only JSON, and my name is ${username}.`;
-
+const init = (botname, username, prompt, memory, lastMessage) => {
   const goals = prompt.split("\n");
   const commandsFormatted = Object.values(commands).map(
     (d) => `${d.name}: ${JSON.stringify(d.settings)}`
   );
-  return message(name, role, goals, commandsFormatted);
+  return message(
+    botname,
+    username,
+    goals,
+    memory,
+    commandsFormatted,
+    lastMessage
+  );
 };
 
 export default init;

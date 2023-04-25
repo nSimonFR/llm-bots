@@ -12,9 +12,14 @@ const broadcast = async (env, phrase) => {
   );
 };
 
-const telegramChat = async (env, { chatId, username, text, message_id }) => {
+const telegramChat = async (
+  env,
+  { chatId, username, text, message_id: messageId }
+) => {
   const value = await env.conversations.get(chatId);
-  const { conversationId, parentMessageId } = value ? JSON.parse(value) : {};
+  const { conversationId, parentMessageId, lastMessage } = value
+    ? JSON.parse(value)
+    : {};
 
   const words = text.split(" ");
   let prompt = text;
@@ -58,7 +63,7 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
 
   let result;
   if (ALLOWED_CHATGPTPLUS_USERS.includes(chatId.toString())) {
-    result = await chatGPTPlus(env, prompt, username, {
+    result = await chatGPTPlus(env, prompt, username, messageId, lastMessage, {
       conversationId,
       parentMessageId,
     });
@@ -71,21 +76,21 @@ const telegramChat = async (env, { chatId, username, text, message_id }) => {
 
   await sendMessageToTelegram(env, chatId, result.text);
 
-  if (!result.error) {
-    if (result.id) {
-      await env.conversations.put(
-        chatId,
-        JSON.stringify({
-          username,
-          message_id,
-          conversationId: result.conversationId,
-          parentMessageId: result.id,
-        })
-      );
-    }
-  } else {
+  if (result.error) {
     throw new Error(result.text);
   }
+  if (!result.id) return;
+
+  await env.conversations.put(
+    chatId,
+    JSON.stringify({
+      username,
+      messageId,
+      lastMessage: result.text,
+      conversationId: result.conversationId,
+      parentMessageId: result.id,
+    })
+  );
 };
 
 const chatWrapped = async (env, message) => {
