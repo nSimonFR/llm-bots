@@ -28,7 +28,7 @@ export default class KVHistory extends BaseChatMessageHistory {
           return typedMessage;
         }
         default:
-          throw new Error(`invalid_message_type_${m.type}`);
+          throw new Error(`invalid messagetype: ${m.type}`);
       }
     });
 
