@@ -1,6 +1,6 @@
 import chatGPT from "./bots/chatgpt";
 import chatGPTPlus from "./bots/chagpt+";
-import languageChain from "./bots/languagechain";
+import { GPTChain, GPTSQL } from "./bots/langchain";
 
 // import transcribeAudioToText from "./utils/speechtotext";
 import {
