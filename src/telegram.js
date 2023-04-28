@@ -23,10 +23,8 @@ const telegramChat = async ({
   text,
   message_id: messageId,
 }) => {
-  const value = await process.env.conversations.get(chatId);
-  const { conversationId, parentMessageId, lastMessage } = value
-    ? JSON.parse(value)
-    : {};
+  const { conversationId, parentMessageId, lastMessage, botType } =
+    await process.env.conversations.get(chatId, { type: "json" });
 
   const words = text.split(" ");
   let prompt = text;
@@ -56,6 +54,25 @@ const telegramChat = async ({
       return;
     }
 
+    case "/bot": {
+      const ALLOWED_USERS = [process.env.ADMIN_CHAT_ID];
+      if (!ALLOWED_USERS.includes(chatId.toString())) {
+        throw new Error(`user_${chatId}_botchange`);
+      }
+      await process.env.conversations.put(
+        chatId,
+        JSON.stringify({
+          username,
+          messageId,
+          lastMessage,
+          conversationId,
+          parentMessageId,
+          botType: words[1],
+        })
+      );
+      return;
+    }
+
     // Don't ever use switchcases like this unless you're mandated by some higher power:
     case "/start":
       prompt = "Hello !";
@@ -64,27 +81,47 @@ const telegramChat = async ({
     default:
   }
 
-  const ALLOWED_GPTCHAIN_USERS = [];
-  const ALLOWED_CHATGPTPLUS_USERS = [process.env.ADMIN_CHAT_ID];
-
   let result;
-  if (ALLOWED_GPTCHAIN_USERS.includes(chatId.toString())) {
-    const textResult = await languageChain(prompt);
-    result = {
-      text: textResult,
-      conversationId,
-      parentMessageId,
-    };
-  } else if (ALLOWED_CHATGPTPLUS_USERS.includes(chatId.toString())) {
-    result = await chatGPTPlus(prompt, username, messageId, lastMessage, {
-      conversationId,
-      parentMessageId,
-    });
-  } else {
-    result = await chatGPT(prompt, {
-      conversationId,
-      parentMessageId,
-    });
+  switch (botType) {
+    case "gptchain": {
+      const textResult = await GPTChain(prompt);
+      result = {
+        text: textResult,
+        conversationId,
+        parentMessageId,
+      };
+      break;
+    }
+
+    case "gptsql": {
+      const textResult = await GPTSQL(prompt);
+      result = {
+        text: textResult,
+        conversationId,
+        parentMessageId,
+      };
+      break;
+    }
+
+    case "gpt+": {
+      result = await chatGPTPlus(prompt, username, messageId, lastMessage, {
+        conversationId,
+        parentMessageId,
+      });
+      break;
+    }
+
+    case undefined: {
+      result = await chatGPT(prompt, {
+        conversationId,
+        parentMessageId,
+      });
+      break;
+    }
+
+    default: {
+      throw new Error(`unknown_bot_${botType}`);
+    }
   }
 
   await sendMessageToTelegram(chatId, result.text);
