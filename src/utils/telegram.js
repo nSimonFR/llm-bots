@@ -1,5 +1,5 @@
 const telegramHelper = async (url, body = undefined) => {
-  if (process.env.NODE_ENV === "test") return;
+  if (process.env.NODE_ENV === "test") return null;
 
   const response = await fetch(
     `https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}${url}`,
@@ -11,6 +11,8 @@ const telegramHelper = async (url, body = undefined) => {
     console.error(url, body, error);
     throw new Error(error);
   }
+
+  return response.json();
 };
 
 export const sendMessageToTelegram = async (chat_id, text) =>
@@ -54,4 +56,9 @@ export const sendAudioToTelegram = async (chat_id, audio, format = "mp3") => {
     })}`,
     formData
   );
+};
+
+export const getAudioFromTelegram = async (fileId) => {
+  const file = await telegramHelper(`/getFile?file_id=${fileId}`);
+  return `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${file.result.file_path}`;
 };

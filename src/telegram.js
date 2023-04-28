@@ -2,7 +2,11 @@ import chatGPT from "./bots/chatgpt";
 import chatGPTPlus from "./bots/chagpt+";
 import languageChain from "./bots/languagechain";
 
-import { sendMessageToTelegram } from "./utils/telegram";
+// import transcribeAudioToText from "./utils/speechtotext";
+import {
+  // getAudioFromTelegram,
+  sendMessageToTelegram,
+} from "./utils/telegram";
 
 const broadcast = async (phrase) => {
   const conversationsResult = await process.process.env.conversations.list();
@@ -98,24 +102,33 @@ const telegramChat = async ({
       lastMessage: result.text,
       conversationId: result.conversationId,
       parentMessageId: result.id,
+      botType,
     })
   );
 };
 
-const chatWrapped = async (message) => {
-  const {
-    chat: { id: chatId, username },
-    text,
-    message_id,
-  } = message;
-
+const chatWrapped = async ({
+  chat: { id: chatId, username },
+  text,
+  // voice,
+  message_id,
+}) => {
   try {
+    if (!text) {
+      // if (voice) {
+      //   const audio = await getAudioFromTelegram(voice.file_id);
+      //   // eslint-disable-next-line no-param-reassign
+      //   text = await transcribeAudioToText(audio);
+      // } else {
+      throw new Error("no_text");
+      // }
+    }
     await telegramChat({ chatId, username, text, message_id });
   } catch (err) {
-    console.error(err);
+    console.error(err.stack);
     await sendMessageToTelegram(
       process.env.ADMIN_CHAT_ID,
-      `Error on ${username} (${chatId}):\n${err.message}`
+      `Error on ${username} (${chatId}):\n${err.stack}`
     );
   }
 };
