@@ -4,15 +4,21 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "deploy": "npx wrangler publish --outdir out --minify && npx wrangler tail",
+    "deploy": "npx wrangler publish --outdir out && npx wrangler tail",
     "logs": "npx wrangler tail",
     "start": "wrangler dev",
     "secrets": "./secrets.sh",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest tests --runInBand"
   },
   "dependencies": {
+    "@google-cloud/speech": "^5.4.1",
     "@pinecone-database/pinecone": "^0.0.12",
-    "chatgpt": "^5.2.2"
+    "chatgpt": "^5.2.2",
+    "cheerio": "^1.0.0-rc.12",
+    "langchain": "^0.0.64",
+    "openai": "^3.2.1",
+    "pg": "^8.10.0",
+    "typeorm": "^0.3.15"
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
