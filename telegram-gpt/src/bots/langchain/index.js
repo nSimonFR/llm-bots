@@ -20,6 +20,11 @@ const getModel = () =>
     temperature: 0,
     callbacks: [
       {
+        handleLLMStart(llm, prompts) {
+          console.log(`Prompts:`, prompts[0]);
+        },
+      },
+      {
         handleLLMEnd(out) {
           console.log(
             `LLM result (${out.llmOutput.tokenUsage.totalTokens}):\n${out.generations[0][0].text}`
@@ -103,6 +108,7 @@ export const GPTSQL = async (input) => {
   });
   const db = await SqlDatabase.fromDataSourceParams({
     appDataSource: datasource,
+    sampleRowsInTableInfo: 1,
   });
   const toolkit = new SqlToolkit(db);
   const executor = createSqlAgent(model, toolkit, {
