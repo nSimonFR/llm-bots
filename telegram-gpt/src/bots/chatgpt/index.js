@@ -1,4 +1,4 @@
-import { ChatGPTUnofficialProxyAPI } from "chatgpt";
+import { ChatGPTUnofficialProxyAPI } from "@nsimon/chatgpt";
 
 import { errorAndTimeoutWrapper } from "../../utils/commons";
 

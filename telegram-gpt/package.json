@@ -13,7 +13,7 @@
   "dependencies": {
     "@google-cloud/speech": "^5.4.1",
     "@pinecone-database/pinecone": "^0.0.12",
-    "chatgpt": "^5.2.2",
+    "@nsimon/chatgpt": "5.2.4-proxy",
     "cheerio": "^1.0.0-rc.12",
     "langchain": "^0.0.70",
     "openai": "^3.2.1",
