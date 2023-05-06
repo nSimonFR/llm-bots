@@ -5,8 +5,8 @@
  * DOES NOT WORK !
  */
 
-import { sendKey } from "../utils/gradio-ws";
-import { timeoutP } from "../utils/commons";
+import { sendKey } from "../../utils/gradio-ws";
+import { timeoutP } from "../../utils/commons";
 
 const TIMEOUT = 55000;
 

@@ -1,6 +1,6 @@
 import { ChatGPTUnofficialProxyAPI } from "chatgpt";
 
-import { errorAndTimeoutWrapper } from "../utils/commons";
+import { errorAndTimeoutWrapper } from "../../utils/commons";
 
 const chatGPT = async (prompt, chatGPTSettings) => {
   const chatGPTAPI = new ChatGPTUnofficialProxyAPI({
