@@ -8,8 +8,11 @@ export const errorAndTimeoutWrapper = async (promise) => {
 
   const handleErrors = async (e) => {
     console.error(e);
+    const message = e.statusCode
+      ? `${e.statusCode}: ${e.statusText}`
+      : e.message;
     return {
-      text: `ChatGPT error ${e.statusCode}: ${e.statusText}`,
+      text: `ChatGPT error ${message}`,
       error: true,
     };
   };
