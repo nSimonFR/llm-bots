@@ -9,7 +9,6 @@ export default {
         await telegramChat(payload.message);
       }
     }
-    // eslint-disable-next-line no-undef
     return new Response("Ok");
   },
 };

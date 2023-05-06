@@ -9,33 +9,12 @@
   "rules": {
     "prettier/prettier": "error",
     "prefer-destructuring": 0,
-    "camelcase": 0,
-    "no-console": [
-      "error",
-      {
-        "allow": [
-          "warn",
-          "error",
-          "log"
-        ]
-      }
-    ],
-    "import/no-unresolved": "off",
-    "no-unused-vars": [
-      "error",
-      {
-        "varsIgnorePattern": "^_"
-      }
-    ],
-    "no-underscore-dangle": "off",
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": true
-      }
-    ]
+    "no-unused-vars": "error",
   },
   "env": {
     "jest": true
+  },
+  "globals": {
+    "WebAssembly": "readonly"
   }
 }
