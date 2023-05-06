@@ -1,0 +1,23 @@
+name = "telegram"
+main = "src/index.js"
+compatibility_date = "2023-03-01"
+usage_model = "bundled"
+node_compat = true
+env = { }
+kv_namespaces = [
+    { binding = "conversations", id = "385d3890496d4a43aaf599ad991d79a1" }
+]
+
+[vars]
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "telegram"
+database_id = "2c9dc5a6-7139-4e97-921e-d6a2357fdeef"
+
+[[rules]]
+globs = ["**/*.wasm"]
+type = "CompiledWasm"
+
+[triggers]
+crons = [ ]
