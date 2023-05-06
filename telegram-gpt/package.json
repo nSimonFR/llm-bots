@@ -19,8 +19,5 @@
     "openai": "^3.2.1",
     "pg": "^8.10.0",
     "typeorm": "0.3.14"
-  },
-  "overrides": {
-    "@dqbd/tiktoken": "../_EXCLUDED_"
   }
 }
