@@ -57,12 +57,13 @@ const telegramChat = async ({
   text,
   message_id: messageId,
 }) => {
+  const json = await process.env.conversations.get(chatId, { type: "json" });
   const {
     conversationId,
     parentMessageId,
     lastMessage,
     botType = BOTS.chatgpt,
-  } = await process.env.conversations.get(chatId, { type: "json" });
+  } = json || {};
 
   const words = text.split(" ");
   let prompt = text;
