@@ -9,7 +9,8 @@
     "secrets": "../secrets.sh"
   },
   "dependencies": {
-    "langchain": "^0.0.70"
+    "langchain": "^0.0.70",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "^20.1.0",
