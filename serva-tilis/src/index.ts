@@ -43,8 +43,9 @@ export default {
       return MyRes(200, "OK");
     } catch (err) {
       const error = err as Error;
-
-      return MyRes(200, error.stack as string);
+      const message = error.stack ? error.stack.toString() : error.message;
+      // TODO Log error somewhere ?
+      return MyRes(200, message);
     }
   },
 };
