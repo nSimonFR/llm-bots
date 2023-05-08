@@ -1,13 +1,13 @@
 import telegramChat from "./telegram";
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, context) {
     process.env = { ...process.env, ...env };
 
     if (request.method === "POST") {
       const payload = await request.json();
       if ("message" in payload) {
-        await telegramChat(payload.message);
+        context.waitUntil(telegramChat(payload.message));
       }
     }
 

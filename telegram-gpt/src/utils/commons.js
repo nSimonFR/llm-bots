@@ -4,7 +4,7 @@ export const timeoutP = (value, timeout) =>
   });
 
 export const errorAndTimeoutWrapper = async (promise) => {
-  const TIMEOUT = 120000;
+  const TIMEOUT = Infinity;
 
   const handleErrors = async (e) => {
     console.error(e);
