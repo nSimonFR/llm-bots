@@ -32,13 +32,6 @@ export default class KVHistory extends BaseChatMessageHistory {
       }
     });
 
-    // console.log(
-    //   [
-    //     "Loaded messages:",
-    //     ...this.messages.map((m) => `${m.type}: ${m.text}`),
-    //   ].join("\n")
-    // );
-
     return this.messages;
   }
 
