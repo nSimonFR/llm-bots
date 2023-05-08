@@ -32,6 +32,7 @@ const getModel = () =>
       baseOptions: {
         headers: {
           "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
+          "Helicone-Property-BotName": "langchain",
           // TODO Helicone-User-Id
         },
       },

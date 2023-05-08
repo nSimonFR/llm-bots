@@ -21,6 +21,7 @@ export default (userId: string) =>
           "Helicone-Retry-Enabled": true,
           "Helicone-Cache-Enabled": true,
           "Helicone-RateLimit-Policy": "100;w=60;s=user",
+          "Helicone-Property-BotName": "ServaTilis",
         },
       },
     }
