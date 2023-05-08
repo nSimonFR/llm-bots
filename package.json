@@ -4,7 +4,8 @@
   "author": "nSimonFR",
   "private": true,
   "workspaces": [
-    "telegram-gpt"
+    "telegram-gpt",
+    "serva-tilis"
   ],
   "repository": {
     "type": "git",

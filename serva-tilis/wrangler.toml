@@ -1,0 +1,9 @@
+name = "serva-tilis"
+main = "src/index.ts"
+compatibility_date = "2023-03-01"
+usage_model = "bundled"
+node_compat = true
+env = { }
+kv_namespaces = [
+  { binding = "history", id = "bbadd29e347d40b9949e1d4075b533f1" }
+]
