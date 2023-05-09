@@ -38,6 +38,10 @@ export default {
         text,
       } = telegramMessage.message;
 
+      if (chatId.toString() !== process.env.ADMIN_CHAT_ID) {
+        throw new Error("not_admin");
+      }
+
       await treatMessage({ id: chatId.toString(), name: username }, text);
 
       return MyRes(200, "OK");
