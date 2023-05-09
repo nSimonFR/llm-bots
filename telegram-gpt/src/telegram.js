@@ -143,14 +143,10 @@ const telegramChat = async ({
     }
 
     case BOTS.chatgpt: {
-      result = await chatGPT(
-        prompt,
-        {
-          conversationId,
-          parentMessageId,
-        },
-        chatId.toString() === process.env.ADMIN_CHAT_ID
-      );
+      result = await chatGPT(prompt, {
+        conversationId,
+        parentMessageId,
+      });
       break;
     }
 
