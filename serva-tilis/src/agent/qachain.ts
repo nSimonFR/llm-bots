@@ -14,12 +14,11 @@ const getPineconeIndex = async () => {
   return client.Index(process.env.PINECONE_INDEX as string);
 };
 
-export default async (userId: string, input: string) => {
+export default async (userId: string, input: string, namespace: string) => {
   const model = getModel(userId);
 
   const pineconeIndex = await getPineconeIndex();
 
-  const namespace = "github";
   const vectorStore = await PineconeStore.fromExistingIndex(
     new OpenAIEmbeddings(),
     { pineconeIndex, namespace }
