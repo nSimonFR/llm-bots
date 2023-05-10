@@ -38,7 +38,8 @@ const checkAndParseTelegramMessage = async (json: unknown) => {
     await sendMessageToTelegram(id, text);
   };
 
-  await sendChatActionToTelegram(id, "typing");
+  sendChatActionToTelegram(id, "typing");
+  setInterval(() => sendChatActionToTelegram(id, "typing"), 5000);
 
   return {
     id,
