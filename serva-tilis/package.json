@@ -7,6 +7,7 @@
     "dropvectors": "ts-node tools/dropvectors.ts",
     "ïmportvectors": "ts-node tools/importvectors.ts",
     "logs": "npx wrangler tail",
+    "refresh-telegram": "ts-node tools/refreshtelegram.ts",
     "start": "wrangler dev",
     "secrets": "../secrets.sh"
   },
