@@ -8,7 +8,7 @@ import {
 } from "langchain/agents";
 import type { VectorOperationsApi } from "@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch";
 
-import getModel from "./utils/model";
+import getModel from "../utils/model";
 
 const getPineconeIndex = async () => {
   const client = new PineconeClient();
