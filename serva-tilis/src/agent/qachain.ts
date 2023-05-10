@@ -17,7 +17,7 @@ const getPineconeIndex = async () => {
   return client.Index(process.env.PINECONE_INDEX as string);
 };
 
-export default async (userId: string, input: string, namespace: string) => {
+export default (namespace: string) => async (userId: string, input: string) => {
   const model = getModel(userId);
 
   const pineconeIndex = await getPineconeIndex();

@@ -36,13 +36,14 @@ export default async (userId: string, input: string) => {
   ];
 
   const kvstore = process.env.history as unknown as KVNamespace;
+  const storeKey = `${userId}-memory`;
   const memory = new BufferWindowMemory({
     k: 5,
     returnMessages: true,
     memoryKey: "chat_history",
     inputKey: "input",
     outputKey: "output",
-    chatHistory: new KVHistory(kvstore, userId),
+    chatHistory: new KVHistory(kvstore, storeKey),
   });
 
   const executor = await initializeAgentExecutorWithOptions(tools, model, {

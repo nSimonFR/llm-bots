@@ -21,34 +21,34 @@ const parseMessage = async (json: unknown): Promise<ChatMessage> =>
     // TODO Add other message types here
   ]);
 
-export default {
-  async fetch(
-    request: Request,
-    env: { [key: string]: string },
-    ctx: ExecutionContext
-  ): Promise<Response> {
-    process.env = { ...process.env, ...env };
+const fetch = async (
+  request: Request,
+  env: { [key: string]: string },
+  ctx: ExecutionContext
+): Promise<Response> => {
+  process.env = { ...process.env, ...env };
 
-    if (request.method !== "POST") {
-      return MyRes(405, "Method Not Allowed");
-    }
+  if (request.method !== "POST") {
+    return MyRes(405, "Method Not Allowed");
+  }
 
-    const json = await request.json().catch((e) => null);
-    if (!json) {
-      return MyRes(400, "Bad Request");
-    }
+  const json = await request.json().catch((e) => null);
+  if (!json) {
+    return MyRes(400, "Bad Request");
+  }
 
-    const message: ChatMessage | null = await parseMessage(json).catch(
-      (e) => null
-    );
-    if (!message) {
-      return MyRes(406, "Not Acceptable");
-    }
+  const message: ChatMessage | null = await parseMessage(json).catch(
+    (e) => null
+  );
+  if (!message) {
+    return MyRes(406, "Not Acceptable");
+  }
 
-    ctx.waitUntil(
-      treatMessage(message.id, message.name, message.text, message.oncomplete)
-    );
+  ctx.waitUntil(
+    treatMessage(message.id, message.name, message.text, message.oncomplete)
+  );
 
-    return MyRes(200, "OK");
-  },
+  return MyRes(200, "OK");
 };
+
+export default { fetch };
