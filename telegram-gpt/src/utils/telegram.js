@@ -24,6 +24,14 @@ export const sendMessageToTelegram = async (chat_id, text) =>
     })}`
   );
 
+export const sendChatActionToTelegram = async (chat_id, action = "typing") =>
+  telegramHelper(
+    `/sendChatAction?${new URLSearchParams({
+      chat_id,
+      action,
+    })}`
+  );
+
 export const sendPhotoToTelegram = async (chat_id, photo, format = "jpg") => {
   const formData = new FormData();
 
