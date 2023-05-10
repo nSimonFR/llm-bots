@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { sendMessageToTelegram } from "./out";
+import { sendChatActionToTelegram, sendMessageToTelegram } from "./out";
 
 const TelegramMessage = z.object({
   update_id: z.number(),
@@ -30,14 +30,15 @@ const TelegramMessage = z.object({
 const checkAndParseTelegramMessage = async (json: unknown) => {
   const telegramMessage = await TelegramMessage.parseAsync(json);
 
-  const {
-    chat: { id, username: name },
-    text,
-  } = telegramMessage.message;
+  const id = telegramMessage.message.chat.id.toString();
+  const name = telegramMessage.message.chat.username;
+  const text = telegramMessage.message.text;
 
   const oncomplete = async (text: string) => {
-    await sendMessageToTelegram(id.toString(), text);
+    await sendMessageToTelegram(id, text);
   };
+
+  await sendChatActionToTelegram(id, "typing");
 
   return {
     id,

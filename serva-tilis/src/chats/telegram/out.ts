@@ -1,13 +1,14 @@
-const telegramHelper = async (
+export const telegramHelper = async (
   url: string,
   body: FormData | undefined = undefined
 ) => {
   if (process.env.NODE_ENV === "test") return null;
 
-  const response = await fetch(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}${url}`,
-    { method: body ? "POST" : "GET", body }
-  );
+  const baseURL = `https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}`;
+  const response = await fetch(baseURL + url, {
+    method: body ? "POST" : "GET",
+    body,
+  });
 
   if (!response.ok) {
     const error = await response.text();
@@ -24,6 +25,17 @@ export const sendMessageToTelegram = async (chat_id: string, text: string) =>
       chat_id,
       text: text.replace("#", ""),
       parse_mode: "Markdown",
+    })}`
+  );
+
+export const sendChatActionToTelegram = async (
+  chat_id: string,
+  action: string
+) =>
+  telegramHelper(
+    `/sendChatAction?${new URLSearchParams({
+      chat_id,
+      action,
     })}`
   );
 
