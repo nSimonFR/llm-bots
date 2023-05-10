@@ -1,8 +1,7 @@
-import { PineconeClient } from "@pinecone-database/pinecone";
-
 import * as dotenv from "dotenv";
+process.env = { ...process.env, ...dotenv.config().parsed };
 
-dotenv.config();
+import { PineconeClient } from "@pinecone-database/pinecone";
 
 const dropNamespace = async (namespace: string) => {
   const client = new PineconeClient();

@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "deploy": "npx wrangler publish --outdir out && npm run logs",
+    "dropvectors": "ts-node tools/dropvectors.ts",
+    "ïmportvectors": "ts-node tools/importvectors.ts",
     "logs": "npx wrangler tail",
     "start": "wrangler dev",
     "secrets": "../secrets.sh"
@@ -16,6 +18,7 @@
     "@cloudflare/workers-types": "^4.20230419.0",
     "@dqbd/tiktoken": "^1.0.7",
     "@types/node": "^20.1.0",
+    "dotenv": "^16.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.3"
   }
