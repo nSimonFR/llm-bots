@@ -1,6 +1,6 @@
-import mainAgent from "./agent/chat";
-import qaChain from "./agent/qachain";
-import qaAgent from "./agent/qaagent";
+import mainAgent from "./agents/chat";
+import qaChain from "./agents/qachain";
+import qaAgent from "./agents/qaagent";
 
 type Bot = (username: string, text: string) => Promise<string>;
 

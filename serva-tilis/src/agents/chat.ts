@@ -8,8 +8,8 @@ import { Calculator } from "langchain/tools/calculator";
 import { WebBrowser } from "langchain/tools/webbrowser";
 import { BufferWindowMemory } from "langchain/memory";
 
-import KVHistory from "./utils/kvhistory";
-import getModel from "./utils/model";
+import KVHistory from "../utils/kvhistory";
+import getModel from "../utils/model";
 
 export default async (userId: string, input: string) => {
   const model = getModel(userId);

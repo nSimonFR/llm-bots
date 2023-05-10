@@ -6,7 +6,7 @@ import {
   VectorDBQAChain,
 } from "langchain/chains";
 
-import getModel from "./utils/model";
+import getModel from "../utils/model";
 
 const getPineconeIndex = async () => {
   const client = new PineconeClient();
