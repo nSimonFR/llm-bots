@@ -1,9 +1,12 @@
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
-import { ConversationalRetrievalQAChain } from "langchain/chains";
+import {
+  ConversationalRetrievalQAChain,
+  VectorDBQAChain,
+} from "langchain/chains";
 
-import getModel from "./model";
+import getModel from "./utils/model";
 
 const getPineconeIndex = async () => {
   const client = new PineconeClient();
@@ -28,6 +31,12 @@ export default async (userId: string, input: string, namespace: string) => {
     model,
     vectorStore.asRetriever()
   );
+  // TODO test ?
+  // const chain = VectorDBQAChain.fromLLM(model, vectorStore, {
+  //   k: 5,
+  //   returnSourceDocuments: true,
+  // });
+
   const res = await chain.call({
     question: input,
     chat_history: [
