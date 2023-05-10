@@ -45,7 +45,12 @@ const fetch = async (
   }
 
   ctx.waitUntil(
-    treatMessage(message.id, message.name, message.text, message.oncomplete)
+    treatMessage(
+      message.id,
+      message.name,
+      message.text,
+      message.oncomplete
+    ).catch((e) => console.error(e.stack))
   );
 
   return MyRes(200, "OK");
