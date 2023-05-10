@@ -1,12 +1,25 @@
 import treatMessage from "./controller";
 
-import TelegramMessage from "./chats/telegram/message";
+import checkAndParseTelegramMessage from "./chats/telegram/in";
+
+export type ChatMessage = {
+  id: string;
+  name: string;
+  text: string;
+  oncomplete: (text: string) => Promise<void>;
+};
 
 const MyRes = (status: number, message: string) => {
   const finalMessage = `${status} - ${message}`;
   console.log(finalMessage);
   return new Response(finalMessage, { status });
 };
+
+const parseMessage = async (json: unknown): Promise<ChatMessage> =>
+  Promise.any([
+    checkAndParseTelegramMessage(json),
+    // TODO Add other message types here
+  ]);
 
 export default {
   async fetch(
@@ -25,31 +38,17 @@ export default {
       return MyRes(400, "Bad Request");
     }
 
-    const telegramMessage = await TelegramMessage.parseAsync(json).catch((e) =>
-      console.error(e)
+    const message: ChatMessage | null = await parseMessage(json).catch(
+      (e) => null
     );
-    if (!telegramMessage) {
+    if (!message) {
       return MyRes(406, "Not Acceptable");
     }
 
-    try {
-      const {
-        chat: { id: chatId, username },
-        text,
-      } = telegramMessage.message;
+    ctx.waitUntil(
+      treatMessage(message.id, message.name, message.text, message.oncomplete)
+    );
 
-      if (chatId.toString() !== process.env.ADMIN_CHAT_ID) {
-        throw new Error("not_admin");
-      }
-
-      await treatMessage({ id: chatId.toString(), name: username }, text);
-
-      return MyRes(200, "OK");
-    } catch (err) {
-      const error = err as Error;
-      const message = error.stack ? error.stack.toString() : error.message;
-      // TODO Log error somewhere ?
-      return MyRes(200, message);
-    }
+    return MyRes(200, "OK");
   },
 };

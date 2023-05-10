@@ -1,4 +1,4 @@
-# AI Language Model + Telegram (On Cloudflare Dash)
+# ServaTilis (Servum Utilis)
 
 ## Requirements for deployment
 

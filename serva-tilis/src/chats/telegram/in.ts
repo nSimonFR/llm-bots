@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { sendMessageToTelegram } from "./out";
+
 const TelegramMessage = z.object({
   update_id: z.number(),
   message: z.object({
@@ -25,4 +27,24 @@ const TelegramMessage = z.object({
   }),
 });
 
-export default TelegramMessage;
+const checkAndParseTelegramMessage = async (json: unknown) => {
+  const telegramMessage = await TelegramMessage.parseAsync(json);
+
+  const {
+    chat: { id, username: name },
+    text,
+  } = telegramMessage.message;
+
+  const oncomplete = async (text: string) => {
+    await sendMessageToTelegram(id.toString(), text);
+  };
+
+  return {
+    id,
+    name,
+    text,
+    oncomplete,
+  };
+};
+
+export default checkAndParseTelegramMessage;
