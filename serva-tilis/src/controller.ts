@@ -1,6 +1,7 @@
 import mainAgent from "./agents/chat";
 import qaChain from "./agents/qachain";
 import qaAgent from "./agents/qaagent";
+import type { cfEnvValue } from ".";
 
 type Bot = (username: string, text: string) => Promise<string>;
 
@@ -50,11 +51,11 @@ export default async (
     throw new Error("not_admin");
   }
 
-  const history = process.env.history as unknown as KVNamespace;
+  const history = process.env.history as cfEnvValue;
 
   const result = await (text[0] === "/"
-    ? switchBotType(history, id, text.slice(1))
-    : treatMessage(history, id, username, text));
+    ? switchBotType(history as KVNamespace, id, text.slice(1))
+    : treatMessage(history as KVNamespace, id, username, text));
 
   await reply(result);
 };
