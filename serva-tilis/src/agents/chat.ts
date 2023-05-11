@@ -11,6 +11,8 @@ import { BufferWindowMemory } from "langchain/memory";
 import KVHistory from "../utils/kvhistory";
 import getModel from "../utils/model";
 
+import type { cfEnvValue } from "..";
+
 export default async (userId: string, input: string) => {
   const model = getModel(userId);
 
@@ -21,21 +23,21 @@ export default async (userId: string, input: string) => {
 
   // TODO Scope tools to user !
   const tools: Tool[] = [
-    // new SerpAPI(process.env.SERPAPI_API_KEY, {
-    //   location: "Paris, Ile-de-France, France",
-    //   hl: "en",
-    //   gl: "fr",
-    // }),
+    new SerpAPI(process.env.SERPAPI_API_KEY, {
+      location: "Paris, Ile-de-France, France",
+      hl: "en",
+      gl: "fr",
+    }),
     // new Calculator(),
-    // new WebBrowser({
-    //   model,
-    //   embeddings,
-    //   axiosConfig: { withCredentials: undefined },
-    // }),
+    new WebBrowser({
+      model,
+      embeddings,
+      axiosConfig: { withCredentials: undefined },
+    }),
     // ...zapierToolkit.tools,
   ];
 
-  const kvstore = process.env.history as unknown as KVNamespace;
+  const kvstore = process.env.history as cfEnvValue;
   const storeKey = `${userId}-memory`;
   const memory = new BufferWindowMemory({
     k: 5,
@@ -43,7 +45,7 @@ export default async (userId: string, input: string) => {
     memoryKey: "chat_history",
     inputKey: "input",
     outputKey: "output",
-    chatHistory: new KVHistory(kvstore, storeKey),
+    chatHistory: new KVHistory(kvstore as KVNamespace, storeKey),
   });
 
   const executor = await initializeAgentExecutorWithOptions(tools, model, {

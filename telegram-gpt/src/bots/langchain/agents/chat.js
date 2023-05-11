@@ -23,7 +23,6 @@ const GPTChain = async (model, input) => {
       hl: "en",
       gl: "fr",
     }),
-    new Calculator(),
     new WebBrowser({
       model,
       embeddings,
