@@ -2,11 +2,8 @@ import chatGPT from "./bots/chatgpt";
 import chatGPTPlus from "./bots/chagpt+";
 import { GPTChain, GPTSQL } from "./bots/langchain";
 
-// import transcribeAudioToText from "./utils/speechtotext";
-import {
-  // getAudioFromTelegram,
-  sendMessageToTelegram,
-} from "./utils/telegram";
+import transcribeAudioToText from "./utils/speechtotext";
+import { getAudioFromTelegram, sendMessageToTelegram } from "./utils/telegram";
 
 const BOTS = {
   chatgpt: "chatgpt",
@@ -178,18 +175,18 @@ const telegramChat = async ({
 const chatWrapped = async ({
   chat: { id: chatId, username },
   text,
-  // voice,
+  voice,
   message_id,
 }) => {
   try {
     if (!text) {
-      // if (voice) {
-      //   const audio = await getAudioFromTelegram(voice.file_id);
-      //   // eslint-disable-next-line no-param-reassign
-      //   text = await transcribeAudioToText(audio);
-      // } else {
-      throw new Error("no text");
-      // }
+      if (voice) {
+        const audio = await getAudioFromTelegram(voice.file_id);
+        text = await transcribeAudioToText(audio);
+        sendMessageToTelegram(chatId, `Transcript:\n${text}`);
+      } else {
+        throw new Error("no text");
+      }
     }
     await telegramChat({ chatId, username, text, message_id });
   } catch (err) {
