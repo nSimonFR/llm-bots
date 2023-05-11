@@ -7,6 +7,8 @@ import {
 } from "./out";
 import transcribeAudioToText from "../../utils/speechtotext";
 
+import type { ChatMessage } from "../..";
+
 const TelegramMessage = z.object({
   update_id: z.number(),
   message: z.object({
@@ -37,13 +39,15 @@ const TelegramMessage = z.object({
   }),
 });
 
-const checkAndParseTelegramMessage = async (json: unknown) => {
+const checkAndParseTelegramMessage = async (
+  json: unknown
+): Promise<ChatMessage> => {
   const telegramMessage = await TelegramMessage.parseAsync(json);
 
   const id = telegramMessage.message.chat.id.toString();
   const name = telegramMessage.message.chat.username;
 
-  let text;
+  let text: string;
   if (telegramMessage.message.voice) {
     sendChatActionToTelegram(id, "record_voice");
     const interval = setInterval(
@@ -65,7 +69,8 @@ const checkAndParseTelegramMessage = async (json: unknown) => {
 
     clearInterval(interval);
   } else {
-    text = telegramMessage.message.text;
+    // Conversion because no other types can be set
+    text = telegramMessage.message.text as string;
   }
 
   sendChatActionToTelegram(id, "typing");

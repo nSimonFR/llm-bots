@@ -20,7 +20,7 @@ const MyRes = (status: number, message: string) => {
 const parseMessage = async (json: unknown): Promise<ChatMessage> =>
   Promise.any([
     checkAndParseTelegramMessage(json),
-    // TODO Add other message types here
+    // TODO Add other message parsers here
   ]);
 
 const fetch = async (
