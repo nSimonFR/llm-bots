@@ -9,9 +9,9 @@ type Bot = (username: string, text: string) => Promise<string>;
 
 export const BOTS: Record<string, Bot> = {
   main: mainAgent,
-  qa: qaAgent,
+  multiqa: qaAgent,
   union: qaChain("state-of-the-union"),
-  imagegen: imageGen,
+  image: imageGen,
 };
 
 const switchBotType = async (
