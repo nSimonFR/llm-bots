@@ -2,6 +2,8 @@ import treatMessage from "./controller";
 
 import checkAndParseTelegramMessage from "./chats/telegram/in";
 
+export type cfEnvValue = string | KVNamespace;
+
 export type ChatMessage = {
   id: string;
   name: string;
@@ -23,9 +25,10 @@ const parseMessage = async (json: unknown): Promise<ChatMessage> =>
 
 const fetch = async (
   request: Request,
-  env: { [key: string]: string },
+  env: { [key: string]: cfEnvValue },
   ctx: ExecutionContext
 ): Promise<Response> => {
+  // @ts-ignore
   process.env = { ...process.env, ...env };
 
   if (request.method !== "POST") {
