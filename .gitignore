@@ -1,6 +1,7 @@
 serviceaccount.json
 .env
 .env.json
+.env.yaml
 out/
 .wrangler/
 node_modules/
