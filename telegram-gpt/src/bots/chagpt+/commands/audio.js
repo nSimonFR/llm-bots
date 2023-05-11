@@ -6,7 +6,7 @@ const VOICES = {
 };
 const DEFAULT = "male";
 
-export const generateAudio = async ({ prompt, voice }) => {
+export const generateAudio = async ({ prompt, voice }, chatId) => {
   // TODO Run in background ?
   // TODO Use separate memory buffer
 
@@ -29,7 +29,7 @@ export const generateAudio = async ({ prompt, voice }) => {
   });
 
   const audio = await response.blob();
-  await sendAudioToTelegram(process.env.ADMIN_CHAT_ID, audio);
+  await sendAudioToTelegram(chatId, audio);
 
   return `*Generated audio with voice \`${voice}\`! Transcript:*\n${prompt}`;
 };

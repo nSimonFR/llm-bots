@@ -132,10 +132,17 @@ const telegramChat = async ({
     }
 
     case BOTS.gptplus: {
-      result = await chatGPTPlus(prompt, username, messageId, lastMessage, {
-        conversationId,
-        parentMessageId,
-      });
+      result = await chatGPTPlus(
+        prompt,
+        username,
+        chatId,
+        messageId,
+        lastMessage,
+        {
+          conversationId,
+          parentMessageId,
+        }
+      );
       break;
     }
 

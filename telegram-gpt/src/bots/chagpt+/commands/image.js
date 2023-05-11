@@ -129,7 +129,7 @@ const ENGINES = {
 };
 const DEFAULT = "stablediffusion";
 
-export const generateImage = async ({ prompt, engine }) => {
+export const generateImage = async ({ prompt, engine }, chatId) => {
   // TODO Run in background ?
   const generationMethod = ENGINES[engine];
   if (!generationMethod) {
@@ -139,13 +139,13 @@ export const generateImage = async ({ prompt, engine }) => {
 
   const [updatedPrompt, image] = await generationMethod(prompt);
 
-  await sendPhotoToTelegram(process.env.ADMIN_CHAT_ID, image);
+  await sendPhotoToTelegram(chatId, image);
 
   return `*Generated image with ${engine};*\n${updatedPrompt}`;
 };
 
 const settings = {
-  command_name: "generate_audio",
+  command_name: "generate_image",
   args: { prompt: "<text>", engine: Object.keys(ENGINES).join(`|`) },
 };
 
