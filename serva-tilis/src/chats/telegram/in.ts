@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { sendChatActionToTelegram, sendMessageToTelegram } from "./out";
+import {
+  getAudioFromTelegram,
+  sendChatActionToTelegram,
+  sendMessageToTelegram,
+} from "./out";
+import transcribeAudioToText from "../../utils/speechtotext";
 
 const TelegramMessage = z.object({
   update_id: z.number(),
@@ -22,7 +27,12 @@ const TelegramMessage = z.object({
       type: z.string(),
     }),
     date: z.number(),
-    text: z.string(),
+    text: z.string().optional(),
+    voice: z
+      .object({
+        file_id: z.string(),
+      })
+      .optional(),
     entities: z.unknown(),
   }),
 });
@@ -32,14 +42,38 @@ const checkAndParseTelegramMessage = async (json: unknown) => {
 
   const id = telegramMessage.message.chat.id.toString();
   const name = telegramMessage.message.chat.username;
-  const text = telegramMessage.message.text;
+
+  let text;
+  if (telegramMessage.message.voice) {
+    sendChatActionToTelegram(id, "record_voice");
+    const interval = setInterval(
+      () => sendChatActionToTelegram(id, "record_voice"),
+      5000
+    );
+
+    const audio = await getAudioFromTelegram(
+      telegramMessage.message.voice.file_id
+    );
+    text = await transcribeAudioToText(audio, {
+      encoding: "OGG_OPUS",
+      sampleRateHertz: 48000,
+      languageCode: "fr-FR",
+      alternativeLanguageCodes: ["en-US", "fr-FR"],
+    });
+
+    sendMessageToTelegram(id, `_Transcript:_\n${text}`);
+
+    clearInterval(interval);
+  } else {
+    text = telegramMessage.message.text;
+  }
+
+  sendChatActionToTelegram(id, "typing");
+  setInterval(() => sendChatActionToTelegram(id, "typing"), 5000);
 
   const oncomplete = async (text: string) => {
     await sendMessageToTelegram(id, text);
   };
-
-  sendChatActionToTelegram(id, "typing");
-  setInterval(() => sendChatActionToTelegram(id, "typing"), 5000);
 
   return {
     id,
