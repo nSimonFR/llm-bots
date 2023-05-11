@@ -20,11 +20,10 @@ const switchBotType = async (
   botName: string
 ) => {
   if (!BOTS[botName]) {
-    // Trick to make join work on first line;
     const available = Object.keys(BOTS)
       .map((b) => "- `" + b + "`")
       .join("\n");
-    return `Unknown bot ${botName}, available:${available}`;
+    return `Unknown bot ${botName}, available:\n${available}`;
   }
 
   await history.put(id, botName);
