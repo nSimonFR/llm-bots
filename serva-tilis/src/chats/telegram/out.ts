@@ -80,7 +80,7 @@ export const sendAudioToTelegram = async (
   );
 };
 
-// export const getAudioFromTelegram = async (fileId: string) => {
-//   const file = await telegramHelper(`/getFile?file_id=${fileId}`);
-//   return `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${file.result.file_path}`;
-// };
+export const getAudioFromTelegram = async (fileId: string) => {
+  const file = await telegramHelper(`/getFile?file_id=${fileId}`);
+  return `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${file.result.file_path}`;
+};
