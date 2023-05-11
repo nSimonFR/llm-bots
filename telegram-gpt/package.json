@@ -1,7 +1,7 @@
 {
   "name": "telegram-gpt",
+  "version": "0.0.0",
   "type": "module",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
     "deploy": "npx wrangler publish --outdir out && npx wrangler tail",
@@ -11,7 +11,6 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest tests --runInBand"
   },
   "dependencies": {
-    "@google-cloud/speech": "^5.4.1",
     "@nsimon/chatgpt": "5.2.4-proxy",
     "@pinecone-database/pinecone": "^0.0.12",
     "cheerio": "^1.0.0-rc.12",

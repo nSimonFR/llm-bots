@@ -5,7 +5,8 @@
   "private": true,
   "workspaces": [
     "telegram-gpt",
-    "serva-tilis"
+    "serva-tilis",
+    "tools/speech-to-text"
   ],
   "repository": {
     "type": "git",
