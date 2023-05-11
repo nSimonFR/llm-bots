@@ -22,9 +22,11 @@ const refresh = async () => {
   const formData = new FormData();
   formData.append("commands", JSON.stringify(commands));
   await telegramHelper("/setMyCommands", formData);
+
+  return commands.length;
 };
 
-refresh().then(() => {
-  console.log("Done refreshing bot !");
+refresh().then((l) => {
+  console.log(`Done refreshing bot with ${l} commands !`);
   process.exit(0);
 });
