@@ -1,6 +1,8 @@
 import mainAgent from "./agents/chat";
 import qaChain from "./agents/qachain";
 import qaAgent from "./agents/qaagent";
+import imageGen from "./agents/imagegen";
+
 import type { cfEnvValue } from ".";
 
 type Bot = (username: string, text: string) => Promise<string>;
@@ -9,6 +11,7 @@ export const BOTS: Record<string, Bot> = {
   main: mainAgent,
   qa: qaAgent,
   union: qaChain("state-of-the-union"),
+  imagegen: imageGen,
 };
 
 const switchBotType = async (
