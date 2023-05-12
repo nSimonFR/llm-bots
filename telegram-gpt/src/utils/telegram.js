@@ -1,9 +1,16 @@
-const telegramHelper = async (url, body = undefined) => {
+const telegramHelper = async (url, body) => {
   if (process.env.NODE_ENV === "test") return null;
+
+  const headers = {};
+
+  if (typeof body === "object") {
+    body = JSON.stringify(body);
+    headers["Content-Type"] = "application/json";
+  }
 
   const response = await fetch(
     `https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}${url}`,
-    { method: body ? "POST" : "GET", body }
+    { method: "POST", body, headers }
   );
 
   if (!response.ok) {
@@ -15,25 +22,28 @@ const telegramHelper = async (url, body = undefined) => {
   return response.json();
 };
 
-export const sendMessageToTelegram = async (chat_id, text) =>
-  telegramHelper(
-    `/sendMessage?${new URLSearchParams({
-      chat_id,
-      text: text.replace("#", ""),
-      parse_mode: "Markdown",
-    })}`
+export const sendMessageToTelegram = async (chat_id, text) => {
+  const textEscaped = text.replace(
+    /([\_\*\[\]\(\)\~\>\#\+\-\=\|\{\}\.\!\\])/g,
+    "\\$1"
   );
 
+  return telegramHelper(`/sendMessage`, {
+    chat_id,
+    text: textEscaped,
+    parse_mode: "MarkdownV2",
+  });
+};
+
 export const sendChatActionToTelegram = async (chat_id, action = "typing") =>
-  telegramHelper(
-    `/sendChatAction?${new URLSearchParams({
-      chat_id,
-      action,
-    })}`
-  );
+  telegramHelper(`/sendChatAction`, {
+    chat_id,
+    action,
+  });
 
 export const sendPhotoToTelegram = async (chat_id, photo, format = "jpg") => {
   const formData = new FormData();
+  formData.append("chat_id", chat_id);
 
   // Check if file or blob:
   if (typeof photo.name === "string") {
@@ -43,27 +53,17 @@ export const sendPhotoToTelegram = async (chat_id, photo, format = "jpg") => {
     formData.append("photo", photo);
   }
 
-  return telegramHelper(
-    `/sendPhoto?${new URLSearchParams({
-      chat_id,
-      parse_mode: "Markdown",
-    })}`,
-    formData
-  );
+  return telegramHelper(`/sendPhoto`, formData);
 };
 
 export const sendAudioToTelegram = async (chat_id, audio, format = "mp3") => {
-  const formData = new FormData();
   const randomId = Math.round(Date.now()).toString(36);
-  formData.append("document", audio, `${randomId}.${format}`);
 
-  return telegramHelper(
-    `/sendDocument?${new URLSearchParams({
-      chat_id,
-      parse_mode: "Markdown",
-    })}`,
-    formData
-  );
+  const formData = new FormData();
+  formData.append("document", audio, `${randomId}.${format}`);
+  formData.append("chat_id", chat_id);
+
+  return telegramHelper(`/sendDocument`, formData);
 };
 
 export const getAudioFromTelegram = async (fileId) => {
