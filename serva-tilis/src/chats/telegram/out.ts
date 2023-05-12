@@ -12,7 +12,7 @@ export const telegramHelper = async (
 
   if (!response.ok) {
     const error = await response.text();
-    console.error(url, body, error);
+    console.error(url, JSON.stringify(body), error);
     throw new Error(error);
   }
 
@@ -42,6 +42,7 @@ export const sendChatActionToTelegram = async (
 export const sendPhotoToTelegram = async (
   chat_id: string,
   photo: string | Blob,
+  caption?: string,
   format = "jpg"
 ) => {
   const formData = new FormData();
@@ -53,13 +54,12 @@ export const sendPhotoToTelegram = async (
     formData.append("photo", photo);
   }
 
-  return telegramHelper(
-    `/sendPhoto?${new URLSearchParams({
-      chat_id,
-      parse_mode: "Markdown",
-    })}`,
-    formData
-  );
+  const query: Record<string, string> = { chat_id };
+  if (caption) {
+    query.caption = caption;
+  }
+
+  return telegramHelper(`/sendPhoto?${new URLSearchParams(query)}`, formData);
 };
 
 export const sendAudioToTelegram = async (
@@ -74,7 +74,6 @@ export const sendAudioToTelegram = async (
   return telegramHelper(
     `/sendDocument?${new URLSearchParams({
       chat_id,
-      parse_mode: "Markdown",
     })}`,
     formData
   );

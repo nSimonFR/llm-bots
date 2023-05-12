@@ -65,6 +65,7 @@ const checkAndParseTelegramMessage = async (
       alternativeLanguageCodes: ["en-US", "fr-FR"],
     });
 
+    // TODO disable_notification / reply_to_message_id
     sendMessageToTelegram(id, `_Transcript:_\n${text}`);
 
     clearInterval(interval);
