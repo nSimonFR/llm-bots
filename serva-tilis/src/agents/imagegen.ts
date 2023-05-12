@@ -1,18 +1,18 @@
 import { sendPhotoToTelegram } from "../chats/telegram/out";
 import { generateWithHuggingFace, refinePrompt } from "../utils/image";
+import { generatePermutations } from "../utils/array";
 
-const generateImage = async (chatId: string, prompt: string) => {
-  // const model = "CompVis/stable-diffusion-v1-4";
-  // const model = "stabilityai/stable-diffusion-2-1";
-  const model = "prompthero/openjourney-v4";
+const generateImage =
+  (model: string) =>
+  async (username: string, prompt: string, chatId: string) => {
+    const upr = await refinePrompt(prompt).catch((e) => console.warn(e));
+    const updatedPrompt = generatePermutations(upr || prompt, 1)[0];
 
-  const updatedPrompt = await refinePrompt(prompt);
-  const image = await generateWithHuggingFace(model)(prompt);
+    const image = await generateWithHuggingFace(model)(updatedPrompt);
 
-  // TODO
-  await sendPhotoToTelegram(chatId, image);
+    await sendPhotoToTelegram(chatId, image, updatedPrompt);
 
-  return `_Generated image with prompt:_\n${updatedPrompt}`;
-};
+    return `_Generated image with prompt:_\n${updatedPrompt}`;
+  };
 
 export default generateImage;

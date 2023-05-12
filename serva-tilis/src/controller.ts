@@ -5,13 +5,15 @@ import imageGen from "./agents/imagegen";
 
 import type { cfEnvValue } from ".";
 
-type Bot = (username: string, text: string) => Promise<string>;
+type Bot = (username: string, text: string, chatId: string) => Promise<string>;
 
 export const BOTS: Record<string, Bot> = {
   main: mainAgent,
-  multiqa: qaAgent,
-  union: qaChain("state-of-the-union"),
-  image: imageGen,
+  qa_union: qaChain("state-of-the-union"),
+  qa_multi: qaAgent,
+  img_openjourney_v4: imageGen("prompthero/openjourney-v4"),
+  img_stablediffusion_v1_4: imageGen("CompVis/stable-diffusion-v1-4"),
+  img_stablediffusion_v2_1: imageGen("stabilityai/stable-diffusion-2-1"),
 };
 
 const switchBotType = async (
@@ -23,11 +25,11 @@ const switchBotType = async (
     const available = Object.keys(BOTS)
       .map((b) => "- `" + b + "`")
       .join("\n");
-    return `Unknown bot ${botName}, available:\n${available}`;
+    return `Unknown bot ${"`" + botName + "`"}, available:\n${available}`;
   }
 
   await history.put(id, botName);
-  return `Switched to ${botName}`;
+  return `Switched to ${"`" + botName + "`"}`;
 };
 
 const treatMessage = async (
@@ -40,7 +42,7 @@ const treatMessage = async (
 
   const bot = BOTS[botName as string] || BOTS.main;
 
-  return await bot(username, text);
+  return await bot(username, text, id);
 };
 
 export default async (
