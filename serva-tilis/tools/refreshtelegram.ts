@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 process.env = { ...process.env, ...dotenv.config().parsed };
 
 import { telegramHelper } from "../src/chats/telegram/out";
-import { BOTS } from "../src/controller";
+import BOTS from "../src/agents";
 
 const url = process.env.PUBLIC_URL as string;
 

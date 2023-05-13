@@ -9,6 +9,10 @@ import {
 import type { VectorOperationsApi } from "@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch";
 
 import getModel from "../utils/model";
+import { sendMessageToTelegram } from "../chats/telegram/out";
+
+import type { BaseChain } from "langchain/chains";
+import type { BaseLanguageModel } from "langchain/dist/base_language";
 
 const getPineconeIndex = async () => {
   const client = new PineconeClient();
@@ -36,9 +40,7 @@ const getVector = async (
   };
 };
 
-export default async (userId: string, input: string) => {
-  const model = getModel(userId);
-
+export const agent = async (model: BaseLanguageModel): Promise<BaseChain> => {
   const pineconeIndex = await getPineconeIndex();
 
   const vectors = await Promise.all([
@@ -51,13 +53,22 @@ export default async (userId: string, input: string) => {
   ]);
 
   const toolkit = new VectorStoreRouterToolkit(vectors, model);
-  const agent = createVectorStoreRouterAgent(model, toolkit);
+  const executor = createVectorStoreRouterAgent(model, toolkit);
 
-  const result = await agent.call({ input });
+  return executor;
+};
+
+export default async (userId: string, username: string, input: string) => {
+  const model = getModel(username);
+
+  const executor = await agent(model);
+  const result = await executor.call({ input });
 
   console.log(
     "intermediateSteps:",
     result.intermediateSteps.map((s: any) => s.action.tool)
   );
-  return result.output;
+
+  const text = result.output;
+  await sendMessageToTelegram(userId, text);
 };

@@ -4,18 +4,21 @@ import {
   ZapierToolKit,
 } from "langchain/agents";
 import { SerpAPI, Tool, ZapierNLAWrapper } from "langchain/tools";
-import { Calculator } from "langchain/tools/calculator";
 import { WebBrowser } from "langchain/tools/webbrowser";
 import { BufferWindowMemory } from "langchain/memory";
 
 import KVHistory from "../utils/kvhistory";
 import getModel from "../utils/model";
+import { sendMessageToTelegram } from "../chats/telegram/out";
 
 import type { cfEnvValue } from "..";
+import type { BaseChain } from "langchain/chains";
+import type { BaseLanguageModel } from "langchain/dist/base_language";
 
-export default async (userId: string, input: string) => {
-  const model = getModel(userId);
-
+export const agent = async (
+  model: BaseLanguageModel,
+  storeKey = "memory"
+): Promise<BaseChain> => {
   const embeddings = new OpenAIEmbeddings();
 
   // const zapier = new ZapierNLAWrapper();
@@ -38,7 +41,6 @@ export default async (userId: string, input: string) => {
   ];
 
   const kvstore = process.env.history as cfEnvValue;
-  const storeKey = `${userId}-memory`;
   const memory = new BufferWindowMemory({
     k: 5,
     returnMessages: true,
@@ -61,10 +63,20 @@ export default async (userId: string, input: string) => {
     ],
   });
 
+  return executor;
+};
+
+export default async (userId: string, username: string, input: string) => {
+  const model = getModel(username);
+  const storeKey = `${userId}-memory`;
+  const executor = await agent(model, storeKey);
+
   const result = await executor.call({ input });
   console.log(
     "intermediateSteps:",
     result.intermediateSteps.map((s: any) => s.action.tool)
   );
-  return result.output;
+
+  const text = result.output;
+  await sendMessageToTelegram(userId, text);
 };

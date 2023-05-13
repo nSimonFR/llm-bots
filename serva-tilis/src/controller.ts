@@ -1,20 +1,8 @@
-import mainAgent from "./agents/chat";
-import qaChain from "./agents/qachain";
-import qaAgent from "./agents/qaagent";
-import imageGen from "./agents/imagegen";
+import { sendMessageToTelegram } from "./chats/telegram/out";
+import BOTS from "./agents";
 
 import type { cfEnvValue } from ".";
-
-type Bot = (username: string, text: string, chatId: string) => Promise<string>;
-
-export const BOTS: Record<string, Bot> = {
-  main: mainAgent,
-  qa_union: qaChain("state-of-the-union"),
-  qa_multi: qaAgent,
-  img_openjourney_v4: imageGen("prompthero/openjourney-v4"),
-  img_stablediffusion_v1_4: imageGen("CompVis/stable-diffusion-v1-4"),
-  img_stablediffusion_v2_1: imageGen("stabilityai/stable-diffusion-2-1"),
-};
+import type { ChatMessage } from "./chats";
 
 const switchBotType = async (
   history: KVNamespace,
@@ -29,7 +17,9 @@ const switchBotType = async (
   }
 
   await history.put(id, botName);
-  return `Switched to ${"`" + botName + "`"}`;
+  const result = `Switched to ${"`" + botName + "`"}`;
+
+  await sendMessageToTelegram(id, result);
 };
 
 const treatMessage = async (
@@ -42,24 +32,28 @@ const treatMessage = async (
 
   const bot = BOTS[botName as string] || BOTS.main;
 
-  return await bot(username, text, id);
+  await bot(id, username, text);
 };
 
-export default async (
-  id: string,
-  username: string,
-  text: string,
-  reply: (text: string) => Promise<void>
-) => {
-  if (id.toString() !== process.env.ADMIN_CHAT_ID) {
+export default async (message: ChatMessage) => {
+  if (message.id.toString() !== process.env.ADMIN_CHAT_ID) {
     throw new Error("not_admin");
   }
 
   const history = process.env.history as cfEnvValue;
 
-  const result = await (text[0] === "/"
-    ? switchBotType(history as KVNamespace, id, text.slice(1))
-    : treatMessage(history as KVNamespace, id, username, text));
-
-  await reply(result);
+  if (message.text[0] === "/") {
+    await switchBotType(
+      history as KVNamespace,
+      message.id,
+      message.text.slice(1)
+    );
+  } else {
+    await treatMessage(
+      history as KVNamespace,
+      message.id,
+      message.name,
+      message.text
+    );
+  }
 };
