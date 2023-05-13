@@ -1,0 +1,2 @@
+langchain==0.0.162
+pinecone-client==2.2.1
