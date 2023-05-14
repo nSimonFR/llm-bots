@@ -66,7 +66,6 @@ const convertAudio = async (telegramMessage: TelegramAudio) => {
     `_Transcript:_${text}`,
     telegramMessage.message.message_id.toString()
   );
-
   clearInterval(interval);
 
   return text;

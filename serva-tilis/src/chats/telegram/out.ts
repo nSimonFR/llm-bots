@@ -25,17 +25,24 @@ const telegramHelper = async (url: string, body: object | FormData) => {
   return response.json();
 };
 
-export const sendMessageToTelegram = async (chat_id: string, text: string) => {
+export const sendMessageToTelegram = async (
+  chat_id: string,
+  text: string,
+  reply_to_message?: string
+) => {
   const textEscaped = text.replace(
     /([\_\*\[\]\(\)\~\>\#\+\-\=\|\{\}\.\!\\])/g,
     "\\$1"
   );
 
-  return telegramHelper(`/sendMessage`, {
+  const message = {
     chat_id,
     text: textEscaped,
+    reply_to_message,
     parse_mode: "MarkdownV2",
-  });
+  };
+
+  return telegramHelper(`/sendMessage`, message);
 };
 
 export const sendChatActionToTelegram = async (
