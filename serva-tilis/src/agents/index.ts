@@ -8,6 +8,7 @@ type Bot = (username: string, text: string, chatId: string) => Promise<void>;
 
 const BOTS: Record<string, Bot> = {
   main: mainAgent,
+  translation: translation(),
   qa_union: qaChain("state-of-the-union"),
   qa_multi: qaAgent,
   img_openjourney_v4: imageGen("prompthero/openjourney-v4"),
