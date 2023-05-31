@@ -1,4 +1,4 @@
-const telegramHelper = async (url: string, body: object | FormData) => {
+export const telegramHelper = async (url: string, body: object | FormData) => {
   if (process.env.NODE_ENV === "test") return null;
 
   const headers: HeadersInit = {};

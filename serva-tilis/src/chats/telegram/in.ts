@@ -7,8 +7,9 @@ import {
 } from "./out";
 import transcribeAudioToText from "../../utils/speechtotext";
 
-import type { ChatMessage } from "..";
 import { setImmediateInterval } from "../../utils/common";
+import { switchBotType, treatMessage } from "../../bots";
+import { MyRes } from "../..";
 
 //#region Types
 const baseMessage = z.object({
@@ -71,9 +72,19 @@ const convertAudio = async (telegramMessage: TelegramAudio) => {
   return text;
 };
 
-const checkAndParseTelegramMessage = async (
-  json: unknown
-): Promise<ChatMessage> => {
+const checkAndParse = async (
+  request: Request,
+  waitUntil: ExecutionContext["waitUntil"]
+): Promise<Response> => {
+  if (request.method !== "POST") {
+    return MyRes(405, "Method Not Allowed");
+  }
+
+  const json = await request.json().catch((e) => null);
+  if (!json) {
+    return MyRes(400, "Bad Request");
+  }
+
   const telegramMessage = await TelegramMessage.parseAsync(json);
 
   const id = telegramMessage.message.chat.id.toString();
@@ -88,11 +99,20 @@ const checkAndParseTelegramMessage = async (
     REFRESH_STATUS_INTERVAL
   );
 
-  return {
-    id,
-    name,
-    text,
-  };
+  // TODO Remove:
+  if (id.toString() !== process.env.ADMIN_CHAT_ID) {
+    throw new Error("not_admin");
+  }
+
+  if (text[0] === "/") {
+    await switchBotType(id, text.slice(1));
+  } else {
+    waitUntil(
+      treatMessage(id, name, text).catch((e) => console.error(e.stack))
+    );
+  }
+
+  return MyRes(200, "OK");
 };
 
-export default checkAndParseTelegramMessage;
+export default checkAndParse;

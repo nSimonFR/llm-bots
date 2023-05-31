@@ -4,16 +4,11 @@ process.env = { ...process.env, ...dotenv.config().parsed };
 import { telegramHelper } from "../src/chats/telegram/out";
 import BOTS from "../src/agents";
 
-const url = process.env.PUBLIC_URL as string;
+const url = new URL("/telegram", process.env.PUBLIC_URL).href;
 
 const refresh = async () => {
-  await telegramHelper(`/setWebhook`);
-
-  await telegramHelper(
-    `/setWebhook?${new URLSearchParams({
-      url,
-    })}`
-  );
+  await telegramHelper(`/setWebhook`, { url: "" });
+  await telegramHelper(`/setWebhook`, { url });
 
   const commands = Object.keys(BOTS).map((b) => ({
     command: b,
