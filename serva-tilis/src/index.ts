@@ -1,10 +1,7 @@
-import treatMessage from "./controller";
+import discord from "./chats/discord/in";
+import telegram from "./chats/telegram/in";
 
-import parseMessage, { ChatMessage } from "./chats";
-
-export type cfEnvValue = string | KVNamespace;
-
-const MyRes = (status: number, message: string) => {
+export const MyRes = (status: number, message: string) => {
   const finalMessage = `${status} - ${message}`;
   console.log(finalMessage);
   return new Response(finalMessage, { status });
@@ -12,32 +9,23 @@ const MyRes = (status: number, message: string) => {
 
 const fetch = async (
   request: Request,
-  env: { [key: string]: cfEnvValue },
+  env: { [key: string]: string | KVNamespace },
   ctx: ExecutionContext
 ): Promise<Response> => {
   // @ts-ignore
   process.env = { ...process.env, ...env };
 
-  if (request.method !== "POST") {
-    return MyRes(405, "Method Not Allowed");
+  const path = new URL(request.url).pathname;
+  switch (path) {
+    case "/telegram":
+      return telegram(request, ctx.waitUntil, env.history);
+
+    case "/discord":
+      return discord(request);
+
+    default:
+      return MyRes(400, "Unknown bot");
   }
-
-  const json = await request.json().catch((e) => null);
-  if (!json) {
-    return MyRes(400, "Bad Request");
-  }
-
-  const message: ChatMessage | null = await parseMessage(json).catch((e) => {
-    console.error(e);
-    return null;
-  });
-  if (!message) {
-    return MyRes(406, "Not Acceptable");
-  }
-
-  ctx.waitUntil(treatMessage(message).catch((e) => console.error(e.stack)));
-
-  return MyRes(200, "OK");
 };
 
 export default { fetch };
