@@ -4,12 +4,14 @@ import qaAgent from "./qaagent";
 import imageGen from "./imagegen";
 import translation from "./translation";
 import sql from "./sql";
+import trusk from "./trusk";
 
 type Bot = (username: string, text: string, chatId: string) => Promise<void>;
 
 const BOTS: Record<string, Bot> = {
   main: mainAgent,
   sql,
+  trusk,
   translation: translation(),
   qa_union: qaChain("state-of-the-union"),
   qa_multi: qaAgent,
