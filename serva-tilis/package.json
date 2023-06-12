@@ -11,11 +11,11 @@
     "refresh-telegram": "ts-node tools/refreshtelegram.ts",
     "start": "wrangler dev",
     "secrets": "../secrets.sh",
-    "test": "jest --runInBand tests"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "discord-interactions": "^3.4.0",
-    "langchain": "^0.0.72",
+    "langchain": "^0.0.92",
     "zod": "^3.21.4"
   },
   "devDependencies": {
