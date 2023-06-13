@@ -16,6 +16,7 @@ import type { BaseLanguageModel } from "langchain/dist/base_language";
 
 export const agent = async (
   model: BaseLanguageModel,
+  kvstore: KVNamespace,
   storeKey = "memory"
 ): Promise<BaseChain> => {
   const embeddings = new OpenAIEmbeddings();
@@ -39,14 +40,13 @@ export const agent = async (
     // ...zapierToolkit.tools,
   ];
 
-  const kvstore = process.env.history as unknown;
   const memory = new BufferWindowMemory({
     k: 5,
     returnMessages: true,
     memoryKey: "chat_history",
     inputKey: "input",
     outputKey: "output",
-    chatHistory: new KVHistory(kvstore as KVNamespace, storeKey),
+    chatHistory: new KVHistory(kvstore, storeKey),
   });
 
   const executor = await initializeAgentExecutorWithOptions(tools, model, {
@@ -65,10 +65,15 @@ export const agent = async (
   return executor;
 };
 
-export default async (userId: string, username: string, input: string) => {
+export default async (
+  userId: string,
+  username: string,
+  input: string,
+  kvStore: KVNamespace
+) => {
   const model = getModel(username);
   const storeKey = `${userId}-memory`;
-  const executor = await agent(model, storeKey);
+  const executor = await agent(model, kvStore, storeKey);
 
   const result = await executor.call({ input });
   console.log(

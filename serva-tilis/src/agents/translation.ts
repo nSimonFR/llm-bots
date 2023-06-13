@@ -1,4 +1,4 @@
-import { LLMChain } from "langchain";
+import { LLMChain } from "langchain/chains";
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,

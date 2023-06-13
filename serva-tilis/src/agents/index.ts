@@ -1,4 +1,4 @@
-import mainAgent from "./chat";
+import main from "./chat";
 import qaChain from "./qachain";
 import qaAgent from "./qaagent";
 import imageGen from "./imagegen";
@@ -6,10 +6,15 @@ import translation from "./translation";
 import sql from "./sql";
 import trusk from "./trusk";
 
-type Bot = (username: string, text: string, chatId: string) => Promise<void>;
+type Bot = (
+  username: string,
+  text: string,
+  chatId: string,
+  kvStore: KVNamespace
+) => Promise<void>;
 
 const BOTS: Record<string, Bot> = {
-  main: mainAgent,
+  main,
   sql,
   trusk,
   translation: translation(),
