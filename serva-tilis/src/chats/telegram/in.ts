@@ -8,7 +8,7 @@ import {
 import transcribeAudioToText from "../../utils/speechtotext";
 
 import { setImmediateInterval } from "../../utils/common";
-import { switchBotType, treatMessage } from "../../bots";
+import { specialCommands, treatMessage } from "../../bots";
 import { MyRes } from "../..";
 
 //#region Types
@@ -108,7 +108,7 @@ const checkAndParse = async (
 
   console.log(text);
   if (text[0] === "/") {
-    await switchBotType(id, text.slice(1), store);
+    await specialCommands(id, text.slice(1), store);
   } else {
     await treatMessage(id, name, text, store).catch((e) =>
       console.error(e.stack)

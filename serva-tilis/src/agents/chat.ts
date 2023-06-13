@@ -72,7 +72,7 @@ export default async (
   kvStore: KVNamespace
 ) => {
   const model = getModel(username);
-  const storeKey = `${userId}-memory`;
+  const storeKey = `${userId}-chat-memory`;
   const executor = await agent(model, kvStore, storeKey);
 
   const result = await executor.call({ input });

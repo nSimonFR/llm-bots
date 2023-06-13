@@ -1,13 +1,20 @@
 import { sendMessageToTelegram } from "./chats/telegram/out";
 import BOTS from "./agents";
 
-export const switchBotType = async (
+export const specialCommands = async (
   id: string,
   botName: string,
   history: KVNamespace
 ) => {
   let result: string;
-  if (!BOTS[botName]) {
+  if (botName === "clear") {
+    const botName = await history.get(id);
+
+    const key = `${id}-${botName}-memory`;
+    await history.delete(key);
+
+    result = `Cleared memory \`${key}\` !`;
+  } else if (!BOTS[botName]) {
     const available = Object.keys(BOTS)
       .map((b) => "- `" + b + "`")
       .join("\n");

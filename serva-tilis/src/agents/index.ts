@@ -1,4 +1,4 @@
-import main from "./chat";
+import chat from "./chat";
 import qaChain from "./qachain";
 import qaAgent from "./qaagent";
 import imageGen from "./imagegen";
@@ -14,7 +14,7 @@ type Bot = (
 ) => Promise<void>;
 
 const BOTS: Record<string, Bot> = {
-  main,
+  chat,
   sql,
   trusk,
   translation: translation(),

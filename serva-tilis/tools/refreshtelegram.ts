@@ -14,9 +14,10 @@ const refresh = async () => {
     command: b,
     description: `Switch to ${b}`,
   }));
-  const formData = new FormData();
-  formData.append("commands", JSON.stringify(commands));
-  await telegramHelper("/setMyCommands", formData);
+  commands.push({ command: "clear", description: "Clear conversation" });
+
+  const result = await telegramHelper("/setMyCommands", { commands });
+  console.log("/setMyCommands result:", result);
 
   return commands.length;
 };
