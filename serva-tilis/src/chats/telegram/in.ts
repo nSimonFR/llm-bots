@@ -74,7 +74,8 @@ const convertAudio = async (telegramMessage: TelegramAudio) => {
 
 const checkAndParse = async (
   request: Request,
-  waitUntil: ExecutionContext["waitUntil"]
+  waitUntil: ExecutionContext["waitUntil"],
+  store: KVNamespace
 ): Promise<Response> => {
   if (request.method !== "POST") {
     return MyRes(405, "Method Not Allowed");
@@ -100,15 +101,17 @@ const checkAndParse = async (
   );
 
   // TODO Remove:
-  if (id.toString() !== process.env.ADMIN_CHAT_ID) {
-    throw new Error("not_admin");
+  const ALLOWED_USERS = [process.env.ADMIN_CHAT_ID];
+  if (!ALLOWED_USERS.includes(id.toString())) {
+    throw new Error(`${id}_not_allowed`);
   }
 
+  console.log(text);
   if (text[0] === "/") {
-    await switchBotType(id, text.slice(1));
+    await switchBotType(id, text.slice(1), store);
   } else {
-    waitUntil(
-      treatMessage(id, name, text).catch((e) => console.error(e.stack))
+    await treatMessage(id, name, text, store).catch((e) =>
+      console.error(e.stack)
     );
   }
 

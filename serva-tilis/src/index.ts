@@ -15,13 +15,15 @@ const fetch = async (
   // @ts-ignore
   process.env = { ...process.env, ...env };
 
+  const history = env.history as KVNamespace;
+
   const path = new URL(request.url).pathname;
   switch (path) {
     case "/telegram":
-      return telegram(request, ctx.waitUntil, env.history);
+      return telegram(request, ctx.waitUntil, history);
 
     case "/discord":
-      return discord(request);
+      return discord(request, history);
 
     default:
       return MyRes(400, "Unknown bot");
