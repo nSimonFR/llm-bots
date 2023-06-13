@@ -4,11 +4,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import getModel from "../src/utils/model";
-import {
-  agent,
-  recoverDeliveryChain,
-  recoverDeliverySchemaType,
-} from "../src/agents/trusk";
+import { agent } from "../src/agents/trusk";
 
 import type { BaseChain } from "langchain/chains";
 
@@ -459,11 +455,9 @@ const order = {
 };
 
 let agentExecutor: BaseChain;
-let deliveryChain: (input: recoverDeliverySchemaType) => Promise<string>;
 beforeAll(async () => {
   const model = getModel("test-trusk");
   agentExecutor = await agent(model);
-  deliveryChain = await recoverDeliveryChain(model);
 });
 
 test(`Ask command - no id => No tool`, async () => {
@@ -479,7 +473,7 @@ test.skip(`Ask command - with id => Get Delivery`, async () => {
 
   expect(result.intermediateSteps.length).toBe(1);
   expect(result.intermediateSteps[0].action.tool).toBe("recover-order");
-  expect(result.intermediateSteps[0].action.toolInput).toBe("a5CFeW0DmA");
+  expect(result.intermediateSteps[0].action.toolInput.id).toBe("a5CFeW0DmA");
 
   console.log(result.output);
 });
@@ -490,7 +484,7 @@ test.skip(`Ask command - with id => Get Delivery`, async () => {
 
   expect(result.intermediateSteps.length).toBe(1);
   expect(result.intermediateSteps[0].action.tool).toBe("recover-order");
-  expect(result.intermediateSteps[0].action.toolInput).toBe("a5CFeW0DmA");
+  expect(result.intermediateSteps[0].action.toolInput.id).toBe("a5CFeW0DmA");
 
   console.log(result.output);
 });
@@ -501,75 +495,9 @@ test.skip(`Ask command - with id => Get Delivery`, async () => {
 
   expect(result.intermediateSteps.length).toBe(1);
   expect(result.intermediateSteps[0].action.tool).toBe("recover-order");
-  expect(result.intermediateSteps[0].action.toolInput).toBe("a5CFeW0DmA");
+  expect(result.intermediateSteps[0].action.toolInput.id).toBe("a5CFeW0DmA");
 
   console.log(result.output);
-});
-
-test("Command Tool - When", async () => {
-  const input = {
-    id: "a5CFeW0DmA",
-    question: "Quand est prevue ma commande ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  console.log(result);
-});
-
-test("Command Tool - Where", async () => {
-  const input = {
-    id: "a5CFeW0DmA",
-    question: "Ou est ma commande ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  console.log(result);
-});
-
-test("Command Tool - What", async () => {
-  const input = {
-    id: "a5CFeW0DmA",
-    question: "Que se passe t'il avec ma commande ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  console.log(result);
-});
-
-test.skip("Command Tool - Special Case - Curbside", async () => {
-  const input = {
-    id: "a5CFeW0DmA",
-    question: "Le trusker refuse de monter, pourquoi ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  console.log(result);
-});
-
-test.skip("Command Tool - Special Case - Contact Trusker ", async () => {
-  const input = {
-    id: "a5CFeW0DmA",
-    question: "Pouvez vous contacter le chauffeur pour qu'il puisse monter ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  console.log(result);
-});
-
-test("Command Tool - Special Case - How many articles", async () => {
-  const input = {
-    id: "1342238030",
-    question: "Combien y a t'il de colis dans ma commande ?",
-  };
-
-  const result = await deliveryChain(input);
-
-  expect(result).toContain("5");
 });
 
 test.only(`Ask command - with id => Get Delivery`, async () => {
@@ -578,7 +506,7 @@ test.only(`Ask command - with id => Get Delivery`, async () => {
 
   expect(result.intermediateSteps.length).toBe(1);
   expect(result.intermediateSteps[0].action.tool).toBe("recover-order");
-  expect(result.intermediateSteps[0].action.toolInput).toBe("a5CFeW0DmA");
+  expect(result.intermediateSteps[0].action.toolInput.id).toBe("1342238030");
 
   console.log(result.output);
 });
